@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from '@mui/material';
+import { Autocomplete, TextField } from '@mui/material';
 import { availableLanguages } from '../api/translate';
 
 interface LanguageSelectorProps {
@@ -15,27 +15,36 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onChange,
   disabled = false,
 }) => {
-  const handleChange = (event: SelectChangeEvent<string>) => {
-    onChange(event.target.value);
+  const selectedLanguage = availableLanguages.find(lang => lang.code === value);
+
+  const handleChange = (_event: any, newValue: typeof availableLanguages[0] | null) => {
+    if (newValue) {
+      onChange(newValue.code);
+    }
   };
 
   return (
-    <FormControl fullWidth disabled={disabled}>
-      <InputLabel id={`${label.toLowerCase()}-label`}>{label}</InputLabel>
-      <Select
-        labelId={`${label.toLowerCase()}-label`}
-        id={`${label.toLowerCase()}-select`}
-        value={value}
-        label={label}
-        onChange={handleChange}
-      >
-        {availableLanguages.map((language) => (
-          <MenuItem key={language.code} value={language.code}>
-            {language.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+    <Autocomplete
+      options={availableLanguages}
+      getOptionLabel={(option) => option.name}
+      value={selectedLanguage || null}
+      onChange={handleChange}
+      disabled={disabled}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label={label}
+          variant="outlined"
+        />
+      )}
+      renderOption={(props, option) => (
+        <li {...props} key={option.code}>
+          {option.name}
+        </li>
+      )}
+      isOptionEqualToValue={(option, value) => option.code === value?.code}
+      fullWidth
+    />
   );
 };
 
