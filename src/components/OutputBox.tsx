@@ -39,13 +39,16 @@ const OutputBox: React.FC<OutputBoxProps> = ({
           rows={8}
           value={translatedText}
           placeholder={loading ? 'Translating...' : 'Translation will appear here'}
-          disabled
           fullWidth
           variant="outlined"
           sx={{
             '& .MuiOutlinedInput-root': {
               fontSize: '1rem',
               backgroundColor: 'rgba(0, 0, 0, 0.02)',
+              '& .MuiInputBase-input': {
+                color: 'text.primary',
+                cursor: 'text',
+              },
             },
           }}
         />

@@ -14,7 +14,7 @@ export interface TranslationResponse {
 
 // Create axios instance with extended timeout for long-running requests
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: 'http://127.0.0.1:5000',
   timeout: 300000, // 5 minutes timeout
   headers: {
     'Content-Type': 'application/json',
@@ -43,6 +43,19 @@ export const availableLanguages = [
   { code: 'fin_Latn', name: 'Finnish' },
   { code: 'pol_Latn', name: 'Polish' },
   { code: 'tur_Latn', name: 'Turkish' },
+  { code: 'vie_Latn', name: 'Vietnamese' },
+  { code: 'tha_Thai', name: 'Thai' },
+  { code: 'mal_Latn', name: 'Malay' },
+  { code: 'ind_Latn', name: 'Indonesian' },
+  { code: 'fil_Latn', name: 'Filipino' },
+  { code: 'ces_Latn', name: 'Czech' },
+  { code: 'slk_Latn', name: 'Slovak' },
+  { code: 'slv_Latn', name: 'Slovenian' },
+  { code: 'hrv_Latn', name: 'Croatian' },
+  { code: 'srp_Latn', name: 'Serbian' },
+  { code: 'mkd_Latn', name: 'Macedonian' },
+  { code: 'bul_Cyrl', name: 'Bulgarian' },
+  { code: 'ell_Grek', name: 'Greek' },
 ];
 
 export const translateText = async (request: TranslationRequest): Promise<TranslationResponse> => {

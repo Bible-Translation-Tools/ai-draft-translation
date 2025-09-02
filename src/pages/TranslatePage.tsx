@@ -12,6 +12,7 @@ import { SwapHoriz, Clear } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
 import TextInput from '../components/TextInput';
 import OutputBox from '../components/OutputBox';
+import TranslationHistory from '../components/TranslationHistory';
 import { translateText, availableLanguages } from '../api/translate';
 
 interface TranslationHistory {
@@ -58,7 +59,7 @@ const TranslatePage: React.FC = () => {
         timestamp: new Date(),
       };
 
-      setTranslationHistory(prev => [newHistoryItem, ...prev.slice(0, 9)]); // Keep last 10 items
+      setTranslationHistory(prev => [newHistoryItem, ...prev.slice(0, 4)]); // Keep last 5 items
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Translation failed');
     } finally {
@@ -87,7 +88,7 @@ const TranslatePage: React.FC = () => {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        NLLB Translation Service
+        Draft Translation Tool
       </Typography>
 
       <Grid container spacing={3}>
@@ -176,33 +177,7 @@ const TranslatePage: React.FC = () => {
       </Grid>
 
       {/* Translation History */}
-      {translationHistory.length > 0 && (
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Recent Translations
-          </Typography>
-          <Grid container spacing={2}>
-            {translationHistory.map((item) => (
-              <Grid item xs={12} md={6} key={item.id}>
-                <Paper elevation={1} sx={{ p: 2 }}>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {getLanguageName(item.sourceLang)} → {getLanguageName(item.targetLang)}
-                  </Typography>
-                  <Typography variant="body2" sx={{ mb: 1 }}>
-                    <strong>Source:</strong> {item.sourceText}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Translation:</strong> {item.translatedText}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {item.timestamp.toLocaleString()}
-                  </Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-      )}
+      <TranslationHistory items={translationHistory} getLanguageName={getLanguageName} />
     </Container>
   );
 };
