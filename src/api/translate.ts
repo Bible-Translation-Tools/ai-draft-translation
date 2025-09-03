@@ -14,7 +14,7 @@ export interface TranslationResponse {
 
 // Create axios instance with extended timeout for long-running requests
 const apiClient = axios.create({
-  baseURL: 'http://127.0.0.1:5000',
+  baseURL: import.meta.env.VITE_SERVER_API_ENDPOINT,
   timeout: 300000, // 5 minutes timeout
   headers: {
     'Content-Type': 'application/json',
