@@ -1,0 +1,21 @@
+services:
+  translator:
+    build: .
+    container_name: proto-translator
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      - VITE_SERVER_API_ENDPOINT=${VITE_SERVER_API_ENDPOINT}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.proto-translator.rule=Host(`${DNS_NAME_APP}`)"
+      - "traefik.http.routers.proto-translator.entrypoints=websecure"
+      - "traefik.http.routers.proto-translator.tls=true"
+      - "traefik.http.services.proto-translator.loadbalancer.server.port=80"
+    networks:
+      - traefik_default
+
+networks:
+  traefik_default:
+    external: true
