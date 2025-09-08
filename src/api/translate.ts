@@ -75,3 +75,51 @@ export const translateText = async (request: TranslationRequest): Promise<Transl
     throw new Error('An unexpected error occurred');
   }
 };
+
+// Batch translation interfaces
+export interface BatchJobSubmission {
+  job_id: string;
+  status_url: string;
+}
+
+export interface BatchJobStatus {
+  job_id: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed';
+  filenames?: string[];
+  result_url?: string;
+  error?: string;
+}
+
+export const submitBatchTranslation = async (formData: FormData): Promise<BatchJobSubmission> => {
+  try {
+    const response = await apiClient.post<BatchJobSubmission>('/jobs', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        throw new Error(`Batch submission failed: ${error.response.data?.message || error.message}`);
+      }
+      throw new Error(`Network error: ${error.message}`);
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
+
+export const getBatchJobStatus = async (statusUrl: string): Promise<BatchJobStatus> => {
+  try {
+    const response = await apiClient.get<BatchJobStatus>(statusUrl);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        throw new Error(`Status check failed: ${error.response.data?.message || error.message}`);
+      }
+      throw new Error(`Network error: ${error.message}`);
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
