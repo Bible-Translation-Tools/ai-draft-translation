@@ -2,14 +2,14 @@ import axios from 'axios';
 
 export interface TranslationRequest {
   text: string;
-  source_lang: string;
-  target_lang: string;
+  src_lang: string;
+  tgt_lang: string;
 }
 
 export interface TranslationResponse {
   translated_text: string;
-  source_lang: string;
-  target_lang: string;
+  src_lang: string;
+  tgt_lang: string;
 }
 
 // Create axios instance with extended timeout for long-running requests
@@ -60,7 +60,17 @@ export const availableLanguages = [
 
 export const translateText = async (request: TranslationRequest): Promise<TranslationResponse> => {
   try {
-    const response = await apiClient.post<TranslationResponse>('/translate', request);
+    // Convert request to FormData
+    const formData = new FormData();
+    formData.append('text', request.text);
+    formData.append('src_lang', request.src_lang);
+    formData.append('tgt_lang', request.tgt_lang);
+
+    const response = await apiClient.post<TranslationResponse>('/translate', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

@@ -43,8 +43,8 @@ const TranslatePage: React.FC = () => {
     try {
       const response = await translateText({
         text: sourceText,
-        source_lang: sourceLang,
-        target_lang: targetLang,
+        src_lang: sourceLang,
+        tgt_lang: targetLang,
       });
 
       setTranslatedText(response.translated_text);
