@@ -4,7 +4,7 @@ services:
     container_name: proto-translator
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "8003:80"
     environment:
       - VITE_SERVER_API_ENDPOINT=${VITE_SERVER_API_ENDPOINT}
     labels:
