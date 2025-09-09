@@ -13,6 +13,14 @@ RUN corepack enable && corepack prepare pnpm@latest --activate && \
 # Copy source code
 COPY . .
 
+# SPA needs env vars at build time. Pass through as build arg
+ARG VITE_SERVER_API_ENDPOINT
+
+
+# Set environment variables during the build process
+ENV VITE_SERVER_API_ENDPOINT=$VITE_SERVER_API_ENDPOINT
+
+
 # Build the application
 RUN pnpm run build
 
