@@ -18,7 +18,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [isBatchMode, setIsBatchMode] = useState(true);
 
   const handleSwitchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsBatchMode(event.target.checked);

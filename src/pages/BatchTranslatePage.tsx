@@ -196,7 +196,7 @@ const BatchTranslatePage: React.FC = () => {
                 Drag and drop files here or click to browse
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Supports multiple file selection
+                You can select multiple files. Supported file types: usfm
               </Typography>
               <input
                 ref={fileInputRef}
