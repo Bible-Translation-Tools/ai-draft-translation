@@ -26,6 +26,7 @@ import {
   Error as ErrorIcon,
   CheckCircle,
   Schedule,
+  SwapHoriz,
 } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
 import { submitBatchTranslation, availableLanguages } from '../api/translate';
@@ -74,6 +75,12 @@ const BatchTranslatePage: React.FC = () => {
     setSelectedFiles([]);
     setError(null);
   }, []);
+
+  const handleSwapLanguages = useCallback(() => {
+    setSourceLang(targetLang);
+    setTargetLang(sourceLang);
+    setError(null);
+  }, [sourceLang, targetLang]);
 
 
   const handleSubmit = useCallback(async () => {
@@ -267,6 +274,19 @@ const BatchTranslatePage: React.FC = () => {
                 onChange={setTargetLang}
                 disabled={isSubmitting}
               />
+            </Box>
+
+            {/* Swap Languages Button */}
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+              <Button
+                variant="outlined"
+                startIcon={<SwapHoriz />}
+                onClick={handleSwapLanguages}
+                disabled={isSubmitting}
+                sx={{ minWidth: 160 }}
+              >
+                Swap Languages
+              </Button>
             </Box>
 
             <Button
