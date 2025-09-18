@@ -100,6 +100,12 @@ const BatchTranslatePage: React.FC = () => {
       formData.append('src_lang', sourceLang);
       formData.append('tgt_lang', targetLang);
 
+      // Include subscription ID for push notifications if available
+      const subscriptionId = localStorage.getItem('pushSubscriptionId');
+      if (subscriptionId) {
+        formData.append('subscription_id', subscriptionId);
+      }
+
       const response = await submitBatchTranslation(formData);
       
       // Add job to queue
