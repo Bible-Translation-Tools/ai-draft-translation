@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import {
   Container,
-  Grid,
   Paper,
   Typography,
   Box,
@@ -87,11 +86,18 @@ const TranslatePage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Grid container spacing={3}>
+    <Container maxWidth="lg" disableGutters>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 3,
+          alignItems: 'stretch',
+        }}
+      >
         {/* Left Column - Input */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
             <Typography variant="h6" gutterBottom>
               Source Language
             </Typography>
@@ -136,11 +142,11 @@ const TranslatePage: React.FC = () => {
               </Button>
             </Box>
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Right Column - Output */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
             <Typography variant="h6" gutterBottom>
               Target Language
             </Typography>
@@ -170,8 +176,8 @@ const TranslatePage: React.FC = () => {
               />
             </Box>
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
       {/* Translation History */}
       <TranslationHistory items={translationHistory} getLanguageName={getLanguageName} />
