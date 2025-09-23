@@ -88,10 +88,6 @@ const TranslatePage: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        Draft Translation Tool
-      </Typography>
-
       <Grid container spacing={3}>
         {/* Left Column - Input */}
         <Grid item xs={12} md={6}>

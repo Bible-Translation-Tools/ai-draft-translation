@@ -124,10 +124,6 @@ const BatchTranslatePage: React.FC = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        Batch Translation Tool
-      </Typography>
-
       <Grid container spacing={3}>
         {/* Left Column - File Upload and Language Selection */}
         <Grid item xs={12} md={6}>
