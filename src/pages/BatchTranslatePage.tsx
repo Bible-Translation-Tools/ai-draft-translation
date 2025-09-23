@@ -29,7 +29,8 @@ import {
   SwapHoriz,
 } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
-import { submitBatchTranslation, availableLanguages } from '../api/translate';
+import { submitBatchTranslation } from '../api/translate';
+import { availableLanguages } from '../data/languages';
 import { useJobQueue, QueuedJob } from '../hooks/useJobQueue';
 
 const BatchTranslatePage: React.FC = () => {

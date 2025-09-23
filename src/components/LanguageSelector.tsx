@@ -1,6 +1,6 @@
 import React from 'react';
 import { Autocomplete, TextField } from '@mui/material';
-import { availableLanguages } from '../api/translate';
+import { availableLanguages, Language } from '../data/languages';
 
 interface LanguageSelectorProps {
   label: string;
@@ -15,16 +15,16 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onChange,
   disabled = false,
 }) => {
-  const selectedLanguage = availableLanguages.find(lang => lang.code === value);
+  const selectedLanguage: Language | undefined = availableLanguages.find((lang: Language) => lang.code === value);
 
-  const handleChange = (_event: any, newValue: typeof availableLanguages[0] | null) => {
+  const handleChange = (_event: any, newValue: Language | null) => {
     if (newValue) {
       onChange(newValue.code);
     }
   };
 
   return (
-    <Autocomplete
+    <Autocomplete<Language, false, false, false>
       options={availableLanguages}
       getOptionLabel={(option) => option.name}
       value={selectedLanguage || null}

@@ -13,7 +13,8 @@ import LanguageSelector from '../components/LanguageSelector';
 import TextInput from '../components/TextInput';
 import OutputBox from '../components/OutputBox';
 import TranslationHistory from '../components/TranslationHistory';
-import { translateText, availableLanguages } from '../api/translate';
+import { translateText } from '../api/translate';
+import { availableLanguages } from '../data/languages';
 
 interface TranslationHistory {
   id: string;
