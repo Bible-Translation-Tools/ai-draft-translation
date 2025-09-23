@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import {
   Container,
-  Grid,
   Paper,
   Typography,
   Box,
@@ -118,16 +117,24 @@ const BatchTranslatePage: React.FC = () => {
       setIsSubmitting(false);
     }
   }, [selectedFiles, sourceLang, targetLang, addJob]);
-
   
 
-
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Grid container spacing={3}>
+    <Container maxWidth="lg" disableGutters>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 3,
+          alignItems: 'stretch',
+        }}
+      >
         {/* Left Column - File Upload and Language Selection */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
+        <Box className="left-column" sx={{ flex: 1, minWidth: 0 }}>
+          <Paper
+            elevation={0}
+            sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}
+          >
             <Typography variant="h6" gutterBottom>
               Upload Files
             </Typography>
@@ -257,11 +264,11 @@ const BatchTranslatePage: React.FC = () => {
               </Alert>
             )}
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Right Column - Job Queue */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
+        <Box className="right-column" sx={{ flex: 1, minWidth: 0 }}>
+            <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">
                 Translation Jobs
@@ -305,8 +312,8 @@ const BatchTranslatePage: React.FC = () => {
               </List>
             )}
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
     </Container>
   );
 };
