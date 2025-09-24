@@ -7,17 +7,15 @@ import {
   Button,
   Alert,
   List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   Divider,
 } from '@mui/material';
-import { CloudUpload, Clear, SwapHoriz } from '@mui/icons-material';
+import { CloudUpload, SwapHoriz, DeleteOutline } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
 import { submitBatchTranslation } from '../api/translate';
 import { useJobQueue, QueuedJob } from '../hooks/useJobQueue';
 import JobItem from '../components/JobItem';
+import SelectedFileCard from '../components/SelectedFileCard';
 
 const BatchTranslatePage: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -236,38 +234,33 @@ const BatchTranslatePage: React.FC = () => {
 
             {/* Selected Files */}
             {selectedFiles.length > 0 && (
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>
-                  Selected Files ({selectedFiles.length})
-                </Typography>
-                <List dense>
-                  {selectedFiles.map((file, index) => (
-                    <ListItem key={index} sx={{ py: 0.5 }}>
-                      <ListItemText
-                        primary={file.name}
-                        secondary={`${(file.size / 1024).toFixed(1)} KB`}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton
-                          edge="end"
-                          onClick={() => removeFile(index)}
-                          size="small"
-                        >
-                          <Clear />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {/* Clear All Button */}
                 <Button
                   variant="outlined"
-                  startIcon={<Clear />}
+                  startIcon={<DeleteOutline />}
                   onClick={clearFiles}
                   size="small"
-                  sx={{ mt: 1 }}
+                  sx={{
+                    alignSelf: 'flex-end',
+                    borderColor: 'error.main',
+                    color: 'error.main',
+                    '&:hover': {
+                      borderColor: 'error.dark',
+                      backgroundColor: 'error.light',
+                      color: 'error.dark',
+                    }
+                  }}
                 >
                   Clear All
                 </Button>
+
+                {/* File List */}
+                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                   {selectedFiles.map((file, index) => (
+                     <SelectedFileCard key={index} file={file} onRemove={() => removeFile(index)} />
+                   ))}
+                 </Box>
               </Box>
             )}
 
