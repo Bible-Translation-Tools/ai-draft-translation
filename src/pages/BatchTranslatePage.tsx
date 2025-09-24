@@ -26,7 +26,7 @@ const BatchTranslatePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Use the custom hook for job queue management
   const {
     queuedJobs,
@@ -94,7 +94,7 @@ const BatchTranslatePage: React.FC = () => {
       }
 
       const response = await submitBatchTranslation(formData);
-      
+
       // Add job to queue
       const newJob: QueuedJob = {
         id: response.job_id,
@@ -108,7 +108,7 @@ const BatchTranslatePage: React.FC = () => {
       };
 
       addJob(newJob);
-      
+
       // Clear selected files
       setSelectedFiles([]);
     } catch (err) {
@@ -117,7 +117,7 @@ const BatchTranslatePage: React.FC = () => {
       setIsSubmitting(false);
     }
   }, [selectedFiles, sourceLang, targetLang, addJob]);
-  
+
 
   return (
     <Container maxWidth="lg" disableGutters>
@@ -133,12 +133,47 @@ const BatchTranslatePage: React.FC = () => {
         <Box className="left-column" sx={{ flex: 1, minWidth: 0 }}>
           <Paper
             elevation={0}
-            sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}
+            sx={{
+              p: 3,
+              height: 'fit-content',
+              borderRadius: '16px',
+              boxShadow: 'var(--shadow-level-1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '40px'
+            }}
           >
-            <Typography variant="h6" gutterBottom>
-              Upload Files
-            </Typography>
-            
+            {/* Language Selection */}
+            <Box display="flex" flexDirection="row" alignItems="center" gap="16px">
+              <Box flex="1 0 0">
+                <LanguageSelector
+                  label="Source Language"
+                  value={sourceLang}
+                  onChange={setSourceLang}
+                  disabled={isSubmitting}
+                />
+              </Box>
+
+              {/* Swap Languages Button */}
+              <IconButton
+                size="small"
+                aria-label="swap languages"
+                onClick={handleSwapLanguages}
+                disabled={isSubmitting}
+              >
+                <SwapHoriz sx={{ width: 24, height: 24 }} />
+              </IconButton>
+
+              <Box flex="1 0 0">
+                <LanguageSelector
+                  label="Target Language"
+                  value={targetLang}
+                  onChange={setTargetLang}
+                  disabled={isSubmitting}
+                />
+              </Box>
+            </Box>
+
             {/* File Upload Area */}
             <Box
               sx={{
@@ -151,7 +186,6 @@ const BatchTranslatePage: React.FC = () => {
                   borderColor: 'primary.main',
                   backgroundColor: 'action.hover',
                 },
-                mb: 2,
               }}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -175,20 +209,20 @@ const BatchTranslatePage: React.FC = () => {
 
             {/* Selected Files */}
             {selectedFiles.length > 0 && (
-              <Box sx={{ mb: 3 }}>
+              <Box>
                 <Typography variant="subtitle2" gutterBottom>
                   Selected Files ({selectedFiles.length})
                 </Typography>
                 <List dense>
                   {selectedFiles.map((file, index) => (
                     <ListItem key={index} sx={{ py: 0.5 }}>
-                      <ListItemText 
+                      <ListItemText
                         primary={file.name}
                         secondary={`${(file.size / 1024).toFixed(1)} KB`}
                       />
                       <ListItemSecondaryAction>
-                        <IconButton 
-                          edge="end" 
+                        <IconButton
+                          edge="end"
                           onClick={() => removeFile(index)}
                           size="small"
                         >
@@ -210,44 +244,6 @@ const BatchTranslatePage: React.FC = () => {
               </Box>
             )}
 
-            {/* Language Selection */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Source Language
-              </Typography>
-              <LanguageSelector
-                label="Source Language"
-                value={sourceLang}
-                onChange={setSourceLang}
-                disabled={isSubmitting}
-              />
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Target Language
-              </Typography>
-              <LanguageSelector
-                label="Target Language"
-                value={targetLang}
-                onChange={setTargetLang}
-                disabled={isSubmitting}
-              />
-            </Box>
-
-            {/* Swap Languages Button */}
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="outlined"
-                startIcon={<SwapHoriz />}
-                onClick={handleSwapLanguages}
-                disabled={isSubmitting}
-                sx={{ minWidth: 160 }}
-              >
-                Swap Languages
-              </Button>
-            </Box>
-
             <Button
               variant="contained"
               onClick={handleSubmit}
@@ -255,11 +251,11 @@ const BatchTranslatePage: React.FC = () => {
               fullWidth
               size="large"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Please wait...' : 'Translate'}
             </Button>
 
             {error && (
-              <Alert severity="error" sx={{ mt: 2 }}>
+              <Alert severity="error">
                 {error}
               </Alert>
             )}
@@ -268,7 +264,7 @@ const BatchTranslatePage: React.FC = () => {
 
         {/* Right Column - Job Queue */}
         <Box className="right-column" sx={{ flex: 1, minWidth: 0 }}>
-            <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
+          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">
                 Translation Jobs
@@ -294,7 +290,7 @@ const BatchTranslatePage: React.FC = () => {
                 </Box>
               )}
             </Box>
-            
+
             {queuedJobs.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 4 }}>
                 <Typography variant="body1" color="text.secondary">
