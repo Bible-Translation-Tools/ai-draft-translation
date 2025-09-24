@@ -26,6 +26,7 @@ const BatchTranslatePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragActive, setIsDragActive] = useState(false);
 
   // Use the custom hook for job queue management
   const {
@@ -48,10 +49,22 @@ const BatchTranslatePage: React.FC = () => {
     e.preventDefault();
     const files = e.dataTransfer.files;
     handleFileSelect(files);
+    setIsDragActive(false);
   }, [handleFileSelect]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragActive(true);
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragActive(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragActive(false);
   }, []);
 
   const removeFile = useCallback((index: number) => {
@@ -134,7 +147,7 @@ const BatchTranslatePage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: 3,
+              p: '80px',
               height: 'fit-content',
               borderRadius: '16px',
               boxShadow: 'var(--shadow-level-1)',
@@ -177,27 +190,41 @@ const BatchTranslatePage: React.FC = () => {
             {/* File Upload Area */}
             <Box
               sx={{
-                border: '2px dashed #ccc',
-                borderRadius: 2,
-                p: 4,
+                display: 'flex',
+                height: '350px',
+                padding: '40px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '20px',
+                alignSelf: 'stretch',
+                border: '2px dashed #E6E6E6',
+                borderRadius: '16px',
                 textAlign: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  backgroundColor: 'action.hover',
-                },
+                borderColor: isDragActive ? 'primary.main' : undefined,
+                backgroundColor: isDragActive ? 'action.hover' : undefined,
               }}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              onClick={() => fileInputRef.current?.click()}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
             >
-              <CloudUpload sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Drag and drop files here or click to browse
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                You can select multiple files. Supported file types: usfm
-              </Typography>
+              <CloudUpload sx={{ fontSize: 48, color: 'text.secondary' }} />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Browse Files
+              </Button>
+              <Box>
+                <Typography variant="body1" gutterBottom>
+                  Choose file(s) or drag & drop it here                
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Files supported: USFM, DOCX
+                </Typography>
+              </Box>
               <input
                 ref={fileInputRef}
                 type="file"
