@@ -80,18 +80,16 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  event.respondWith(networkFirst({ request, event }));
-  
-  // // Use network-first strategy for API requests to get fresh data
-  // if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/translate') || url.pathname.startsWith('/jobs')) {
-  //   event.respondWith(networkFirst({ request, event }));
-  //   return;
-  // }
-  
-  // // Use cache-first strategy for static assets (HTML, CSS, JS, images, etc.)
-  // if (request.method === "GET") {
-  //   event.respondWith(cacheFirst({ request, event }));
-  // }
+  // Use network-first strategy for API requests to get fresh data
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/translate') || url.pathname.startsWith('/jobs')) {
+    event.respondWith(networkFirst({ request, event }));
+    return;
+  }
+
+  // Use cache-first strategy for static assets (HTML, CSS, JS, images, etc.)
+  if (request.method === "GET") {
+    event.respondWith(cacheFirst({ request, event }));
+  }
 });
 
 // Handle notification requests sent from the page
