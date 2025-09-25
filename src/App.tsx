@@ -30,12 +30,14 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
 
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-          {isBatchMode ? "Document Translation Tool" : "Text Translation Tool"}
-        </Typography>
-        <ModeToggle isBatchMode={isBatchMode} onChange={handleModeChange} />
-      </Box>
+      <Container disableGutters sx={{ paddingTop: '50px' }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
+          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
+            {isBatchMode ? "Document Translation Tool" : "Text Translation Tool"}
+          </Typography>
+          <ModeToggle isBatchMode={isBatchMode} onChange={handleModeChange} />
+        </Box>
+      </Container>
 
       {!isBatchMode && <TranslatePage />}
       {isBatchMode && <BatchTranslatePage />}

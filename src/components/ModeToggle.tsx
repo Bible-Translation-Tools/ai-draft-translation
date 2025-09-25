@@ -8,7 +8,7 @@ interface ModeToggleProps {
 
 const ModeToggle: React.FC<ModeToggleProps> = ({ isBatchMode, onChange }) => {
     return (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", position: 'relative', top: '-50px' }}>
             <ToggleButtonGroup
                 exclusive
                 value={isBatchMode ? "batch" : "single"}
@@ -47,7 +47,7 @@ const ModeToggle: React.FC<ModeToggleProps> = ({ isBatchMode, onChange }) => {
                 }}
             >
                 <ToggleButton value="batch">
-                    <Typography variant="body1">Document</Typography>
+                    <Typography variant="body1">Docs</Typography>
                 </ToggleButton>
                 <ToggleButton value="single">
                     <Typography variant="body1">Text</Typography>

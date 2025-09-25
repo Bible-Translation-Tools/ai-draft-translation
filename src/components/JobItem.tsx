@@ -103,6 +103,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               onClick={() => downloadResult(job.result_url!, job.filenames!)}
               size="small"
               fullWidth
+              sx={{ p: '8px 16px' }}
             >
               Download All
             </Button>
