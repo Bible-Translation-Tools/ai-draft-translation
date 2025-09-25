@@ -1,42 +1,14 @@
 import React from 'react';
-import { Card, CardContent, Box, Typography, Chip, Button, Alert, LinearProgress } from '@mui/material';
+import { Card, CardContent, Box, Typography, Button, Alert, LinearProgress } from '@mui/material';
 import { Download, Error as ErrorIcon, CheckCircle, Schedule } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { availableLanguages } from '../data/languages';
 import { QueuedJob } from '../hooks/useJobQueue';
+import SelectedFileCard from './SelectedFileCard';
 
 interface JobItemProps {
   job: QueuedJob;
 }
-
-const JobItem: React.FC<JobItemProps> = ({ job }) => {
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle color="success" />;
-      case 'failed':
-        return <ErrorIcon color="error" />;
-      case 'processing':
-        return <CircularProgress size={20} color="primary" />;
-      default:
-        return <Schedule color="action" />;
-    }
-  };
-
-  const getStatusColor = (
-    status: string
-  ): 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning' => {
-    switch (status) {
-      case 'completed':
-        return 'success';
-      case 'failed':
-        return 'error';
-      case 'processing':
-        return 'primary';
-      default:
-        return 'default';
-    }
-  };
 
   const getLanguageName = (code: string) => {
     return availableLanguages.find((lang) => lang.code === code)?.name || code;
@@ -51,28 +23,78 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     document.body.removeChild(link);
   };
 
+  
+const JobItem: React.FC<JobItemProps> = ({ job }) => {
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <CheckCircle color="success" />;
+      case 'failed':
+        return <ErrorIcon color="error" />;
+      case 'processing':
+        return <CircularProgress size={20} color="primary" />;
+      default:
+        return <Schedule color="action" />;
+    }
+  };
+
+  // Progress bar based on status
+  const renderProgress = () => {
+    let displayText = '';
+    let progressProps: any = {};
+    let show = true;
+
+    switch (job.status) {
+      case 'processing':
+        displayText = 'Processing...';
+        progressProps = {};
+        break;
+      case 'queued':
+        displayText = 'Queued...';
+        progressProps = {};
+        break;
+      case 'completed':
+        displayText = 'Completed';
+        progressProps = { variant: 'determinate', value: 100, color: 'success' };
+        break;
+      default:
+        show = false;
+    }
+
+    if (!show) return null;
+
+    return (
+      <Box sx={{ textAlign: 'right' }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+          {displayText}
+        </Typography>
+        <LinearProgress {...progressProps} />
+      </Box>
+    );
+  };
+
   return (
-    <Card sx={{ mb: 2 }}>
-      <CardContent sx={{ pb: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+    <Card className='job-item' sx={{ borderRadius: '10px' }}>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <Box sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           {getStatusIcon(job.status)}
-          <Typography variant="subtitle1" sx={{ ml: 1, flexGrow: 1 }}>
-            Job #{job.id.slice(0, 8)}
-          </Typography>
-          <Chip label={job.status} color={getStatusColor(job.status)} size="small" />
+          <Box flex="1 0 0">
+            <Typography variant="h6" color="text.priary">
+              {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Submitted: {job.submittedAt.toLocaleString()}
+            </Typography>
+          </Box>
         </Box>
 
-        <Typography variant="h6" color="text.priary" sx={{ mb: 1 }}>
-          {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
-        </Typography>
+        {renderProgress()}
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-          Files: {job.files.map((f) => f.name).join(', ')}
-        </Typography>
-
-        <Typography variant="caption" color="text.secondary">
-          Submitted: {job.submittedAt.toLocaleString()}
-        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
+          {job.files.map((file, index) => (
+            <SelectedFileCard key={index} file={file} />
+          ))}
+        </Box>
 
         {job.status === 'completed' && job.result_url && job.filenames && (
           <Box sx={{ mt: 2 }}>
@@ -91,15 +113,6 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
           <Alert severity="error" sx={{ mt: 2 }}>
             {job.error}
           </Alert>
-        )}
-
-        {job.status === 'processing' && (
-          <Box sx={{ mt: 2 }}>
-            <LinearProgress />
-            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-              Processing... This may take several minutes.
-            </Typography>
-          </Box>
         )}
       </CardContent>
     </Card>

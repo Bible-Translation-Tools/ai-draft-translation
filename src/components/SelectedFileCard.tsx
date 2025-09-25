@@ -1,26 +1,28 @@
 import React from 'react';
-import { Card, CardContent, Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton } from '@mui/material';
 import { DescriptionOutlined, Clear } from '@mui/icons-material';
 
 type SelectedFileCardProps = {
   file: File;
-  onRemove: () => void;
+  onRemove?: () => void;
 };
 
 const SelectedFileCard: React.FC<SelectedFileCardProps> = ({ file, onRemove }) => {
   return (
-    <Card
+    <Box
       sx={{
-        backgroundColor: '#f2f2f2',
+        ...(onRemove
+          ? {
+              backgroundColor: '#f2f2f2',
+              '&:hover': { backgroundColor: '#e8e8e8' }
+            }
+          : {}),
         border: '1px solid',
         borderColor: '#e6e6e6',
         borderRadius: '12px',
-        '&:hover': {
-          backgroundColor: '#e8e8e8',
-        }
       }}
     >
-      <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
+      <Box sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
             <DescriptionOutlined sx={{ color: '#516b86', fontSize: 32 }} />
@@ -50,22 +52,24 @@ const SelectedFileCard: React.FC<SelectedFileCardProps> = ({ file, onRemove }) =
               </Typography>
             </Box>
           </Box>
-          <IconButton
-            onClick={onRemove}
-            size="small"
-            sx={{ 
-              color: '#0f2f4c',
-              '&:hover': {
-                backgroundColor: 'error.light',
-                color: 'error.main',
-              }
-            }}
-          >
-            <Clear sx={{ fontSize: 18 }} />
-          </IconButton>
+          {onRemove && (
+            <IconButton
+              onClick={onRemove}
+              size="small"
+              sx={{ 
+                color: '#0f2f4c',
+                '&:hover': {
+                  backgroundColor: 'error.light',
+                  color: 'error.main',
+                }
+              }}
+            >
+              <Clear sx={{ fontSize: 18 }} />
+            </IconButton>
+          )}
         </Box>
-      </CardContent>
-    </Card>
+      </Box>
+    </Box>
   );
 };
 

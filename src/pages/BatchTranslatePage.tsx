@@ -145,7 +145,7 @@ const BatchTranslatePage: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              p: '80px',
+              padding: '40px',
               height: 'fit-content',
               borderRadius: '16px',
               boxShadow: 'var(--shadow-level-1)',
@@ -217,7 +217,7 @@ const BatchTranslatePage: React.FC = () => {
               </Button>
               <Box>
                 <Typography variant="body1" gutterBottom>
-                  Choose file(s) or drag & drop it here                
+                  Choose file(s) or drag & drop it here
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   Files supported: USFM, DOCX
@@ -256,11 +256,11 @@ const BatchTranslatePage: React.FC = () => {
                 </Button>
 
                 {/* File List */}
-                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                   {selectedFiles.map((file, index) => (
-                     <SelectedFileCard key={index} file={file} onRemove={() => removeFile(index)} />
-                   ))}
-                 </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {selectedFiles.map((file, index) => (
+                    <SelectedFileCard key={index} file={file} onRemove={() => removeFile(index)} />
+                  ))}
+                </Box>
               </Box>
             )}
 
@@ -284,50 +284,65 @@ const BatchTranslatePage: React.FC = () => {
 
         {/* Right Column - Job Queue */}
         <Box className="right-column" sx={{ flex: 1, minWidth: 0 }}>
-          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">
-                Translation Jobs
-              </Typography>
-              {queuedJobs.length > 0 && (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={clearCompletedJobs}
-                    disabled={!hasCompletedJobs}
-                  >
-                    Clear Completed
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={clearAllJobs}
-                    color="error"
-                  >
-                    Clear All
-                  </Button>
-                </Box>
-              )}
-            </Box>
-
-            {queuedJobs.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
+          {queuedJobs.length === 0 ? (
+            <Paper
+              elevation={0}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                p: '40px',
+                height: '300px',
+                borderRadius: '16px',
+                boxShadow: 'var(--shadow-level-1)'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                gap: '12px',
+                textAlign: 'center' 
+                }}>
+                <Typography variant="h5">
+                  Translation Jobs
+                </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  No translation jobs yet. Upload files and submit to get started.
+                  You don't have any translation jobs yet.
                 </Typography>
               </Box>
-            ) : (
-              <List>
-                {queuedJobs.map((job, index) => (
-                  <React.Fragment key={job.id}>
+            </Paper>
+          ) : (
+            <Paper elevation={0} sx={{ display: 'flex', flexDirection: 'column', gap: '40px',  height: 'fit-content', padding: '40px', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                {queuedJobs.length > 0 && (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={clearCompletedJobs}
+                      disabled={!hasCompletedJobs}
+                    >
+                      Clear Completed
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={clearAllJobs}
+                      color="error"
+                    >
+                      Clear All
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+              
+              <Box sx={{ display: 'flex', flexDirection:'column', gap: '16px' }}>
+                {queuedJobs.map(job => (
                     <JobItem job={job} />
-                    {index < queuedJobs.length - 1 && <Divider />}
-                  </React.Fragment>
                 ))}
-              </List>
-            )}
-          </Paper>
+              </Box>
+            </Paper>
+          )}
         </Box>
       </Box>
     </Container>
