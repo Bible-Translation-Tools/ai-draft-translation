@@ -1,36 +1,21 @@
 import React, { useState, useCallback, useRef } from 'react';
 import {
   Container,
-  Grid,
   Paper,
   Typography,
   Box,
   Button,
-  LinearProgress,
   Alert,
   List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
   IconButton,
-  Chip,
-  Card,
-  CardContent,
   Divider,
-  CircularProgress,
 } from '@mui/material';
-import {
-  CloudUpload,
-  Clear,
-  Download,
-  Error as ErrorIcon,
-  CheckCircle,
-  Schedule,
-  SwapHoriz,
-} from '@mui/icons-material';
+import { CloudUpload, SwapHoriz, DeleteOutline } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
-import { submitBatchTranslation, availableLanguages } from '../api/translate';
+import { submitBatchTranslation } from '../api/translate';
 import { useJobQueue, QueuedJob } from '../hooks/useJobQueue';
+import JobItem from '../components/JobItem';
+import SelectedFileCard from '../components/SelectedFileCard';
 
 const BatchTranslatePage: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -39,7 +24,8 @@ const BatchTranslatePage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const [isDragActive, setIsDragActive] = useState(false);
+
   // Use the custom hook for job queue management
   const {
     queuedJobs,
@@ -61,10 +47,22 @@ const BatchTranslatePage: React.FC = () => {
     e.preventDefault();
     const files = e.dataTransfer.files;
     handleFileSelect(files);
+    setIsDragActive(false);
   }, [handleFileSelect]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragActive(true);
+  }, []);
+
+  const handleDragEnter = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragActive(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragActive(false);
   }, []);
 
   const removeFile = useCallback((index: number) => {
@@ -107,7 +105,7 @@ const BatchTranslatePage: React.FC = () => {
       }
 
       const response = await submitBatchTranslation(formData);
-      
+
       // Add job to queue
       const newJob: QueuedJob = {
         id: response.job_id,
@@ -121,7 +119,7 @@ const BatchTranslatePage: React.FC = () => {
       };
 
       addJob(newJob);
-      
+
       // Clear selected files
       setSelectedFiles([]);
     } catch (err) {
@@ -131,86 +129,100 @@ const BatchTranslatePage: React.FC = () => {
     }
   }, [selectedFiles, sourceLang, targetLang, addJob]);
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle color="success" />;
-      case 'failed':
-        return <ErrorIcon color="error" />;
-      case 'processing':
-        return <CircularProgress size={20} color="primary" />;
-      default:
-        return <Schedule color="action" />;
-    }
-  };
-
-  const getStatusColor = (status: string): "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning" => {
-    switch (status) {
-      case 'completed':
-        return 'success';
-      case 'failed':
-        return 'error';
-      case 'processing':
-        return 'primary';
-      default:
-        return 'default';
-    }
-  };
-
-  const getLanguageName = (code: string) => {
-    return availableLanguages.find(lang => lang.code === code)?.name || code;
-  };
-
-  const downloadResult = (resultUrl: string, filenames: string[]) => {
-    // Create download link
-    const link = document.createElement('a');
-    link.href = `${import.meta.env.VITE_SERVER_API_ENDPOINT}${resultUrl}`;
-    link.download = `translated_${filenames.join('_')}.zip`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        Batch Translation Tool
-      </Typography>
-
-      <Grid container spacing={3}>
+    <Container maxWidth="lg" disableGutters>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 3,
+          alignItems: 'stretch',
+        }}
+      >
         {/* Left Column - File Upload and Language Selection */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
-            <Typography variant="h6" gutterBottom>
-              Upload Files
-            </Typography>
-            
+        <Box className="left-column" sx={{ flex: 1, minWidth: 0 }}>
+          <Paper
+            elevation={0}
+            sx={{
+              padding: '40px',
+              height: 'fit-content',
+              borderRadius: '16px',
+              boxShadow: 'var(--shadow-level-1)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '40px'
+            }}
+          >
+            {/* Language Selection */}
+            <Box display="flex" flexDirection="row" alignItems="center" gap="16px">
+              <Box flex="1 0 0">
+                <LanguageSelector
+                  label="Source Language"
+                  value={sourceLang}
+                  onChange={setSourceLang}
+                  disabled={isSubmitting}
+                />
+              </Box>
+
+              {/* Swap Languages Button */}
+              <IconButton
+                size="small"
+                aria-label="swap languages"
+                onClick={handleSwapLanguages}
+                disabled={isSubmitting}
+              >
+                <SwapHoriz sx={{ width: 24, height: 24 }} />
+              </IconButton>
+
+              <Box flex="1 0 0">
+                <LanguageSelector
+                  label="Target Language"
+                  value={targetLang}
+                  onChange={setTargetLang}
+                  disabled={isSubmitting}
+                />
+              </Box>
+            </Box>
+
             {/* File Upload Area */}
             <Box
               sx={{
-                border: '2px dashed #ccc',
-                borderRadius: 2,
-                p: 4,
+                display: 'flex',
+                height: '350px',
+                padding: '40px',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '20px',
+                alignSelf: 'stretch',
+                border: '2px dashed #E6E6E6',
+                borderRadius: '16px',
                 textAlign: 'center',
-                cursor: 'pointer',
-                '&:hover': {
-                  borderColor: 'primary.main',
-                  backgroundColor: 'action.hover',
-                },
-                mb: 2,
+                borderColor: isDragActive ? 'primary.main' : undefined,
+                backgroundColor: isDragActive ? 'action.hover' : undefined,
               }}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
-              onClick={() => fileInputRef.current?.click()}
+              onDragEnter={handleDragEnter}
+              onDragLeave={handleDragLeave}
             >
-              <CloudUpload sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                Drag and drop files here or click to browse
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                You can select multiple files. Supported file types: usfm
-              </Typography>
+              <CloudUpload sx={{ fontSize: 48, color: 'text.secondary' }} />
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Browse Files
+              </Button>
+              <Box>
+                <Typography variant="body1" gutterBottom>
+                  Choose file(s) or drag & drop it here
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Files supported: USFM, DOCX
+                </Typography>
+              </Box>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -222,78 +234,35 @@ const BatchTranslatePage: React.FC = () => {
 
             {/* Selected Files */}
             {selectedFiles.length > 0 && (
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Selected Files ({selectedFiles.length})
-                </Typography>
-                <List dense>
-                  {selectedFiles.map((file, index) => (
-                    <ListItem key={index} sx={{ py: 0.5 }}>
-                      <ListItemText 
-                        primary={file.name}
-                        secondary={`${(file.size / 1024).toFixed(1)} KB`}
-                      />
-                      <ListItemSecondaryAction>
-                        <IconButton 
-                          edge="end" 
-                          onClick={() => removeFile(index)}
-                          size="small"
-                        >
-                          <Clear />
-                        </IconButton>
-                      </ListItemSecondaryAction>
-                    </ListItem>
-                  ))}
-                </List>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {/* Clear All Button */}
                 <Button
                   variant="outlined"
-                  startIcon={<Clear />}
+                  startIcon={<DeleteOutline />}
                   onClick={clearFiles}
                   size="small"
-                  sx={{ mt: 1 }}
+                  sx={{
+                    alignSelf: 'flex-end',
+                    borderColor: 'error.main',
+                    color: 'error.main',
+                    '&:hover': {
+                      borderColor: 'error.dark',
+                      backgroundColor: 'error.light',
+                      color: 'error.dark',
+                    }
+                  }}
                 >
                   Clear All
                 </Button>
+
+                {/* File List */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                  {selectedFiles.map((file, index) => (
+                    <SelectedFileCard key={index} file={file} onRemove={() => removeFile(index)} />
+                  ))}
+                </Box>
               </Box>
             )}
-
-            {/* Language Selection */}
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Source Language
-              </Typography>
-              <LanguageSelector
-                label="Source Language"
-                value={sourceLang}
-                onChange={setSourceLang}
-                disabled={isSubmitting}
-              />
-            </Box>
-
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Target Language
-              </Typography>
-              <LanguageSelector
-                label="Target Language"
-                value={targetLang}
-                onChange={setTargetLang}
-                disabled={isSubmitting}
-              />
-            </Box>
-
-            {/* Swap Languages Button */}
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-              <Button
-                variant="outlined"
-                startIcon={<SwapHoriz />}
-                onClick={handleSwapLanguages}
-                disabled={isSubmitting}
-                sx={{ minWidth: 160 }}
-              >
-                Swap Languages
-              </Button>
-            </Box>
 
             <Button
               variant="contained"
@@ -302,119 +271,80 @@ const BatchTranslatePage: React.FC = () => {
               fullWidth
               size="large"
             >
-              {isSubmitting ? 'Submitting...' : 'Submit'}
+              {isSubmitting ? 'Please wait...' : 'Translate'}
             </Button>
 
             {error && (
-              <Alert severity="error" sx={{ mt: 2 }}>
+              <Alert severity="error">
                 {error}
               </Alert>
             )}
           </Paper>
-        </Grid>
+        </Box>
 
         {/* Right Column - Job Queue */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: 'fit-content' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6">
-                Translation Jobs
-              </Typography>
-              {queuedJobs.length > 0 && (
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={clearCompletedJobs}
-                    disabled={!hasCompletedJobs}
-                  >
-                    Clear Completed
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={clearAllJobs}
-                    color="error"
-                  >
-                    Clear All
-                  </Button>
-                </Box>
-              )}
-            </Box>
-            
-            {queuedJobs.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box className="right-column" sx={{ flex: 1, minWidth: 0 }}>
+          {queuedJobs.length === 0 ? (
+            <Paper
+              elevation={0}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                p: '40px',
+                height: '300px',
+                borderRadius: '16px',
+                boxShadow: 'var(--shadow-level-1)'
+              }}
+            >
+              <Box sx={{ 
+                display: 'flex',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                gap: '12px',
+                textAlign: 'center' 
+                }}>
+                <Typography variant="h5">
+                  Translation Jobs
+                </Typography>
                 <Typography variant="body1" color="text.secondary">
-                  No translation jobs yet. Upload files and submit to get started.
+                  You don't have any translation jobs yet.
                 </Typography>
               </Box>
-            ) : (
-              <List>
-                {queuedJobs.map((job, index) => (
-                  <React.Fragment key={job.id}>
-                    <Card sx={{ mb: 2 }}>
-                      <CardContent sx={{ pb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                          {getStatusIcon(job.status)}
-                          <Typography variant="subtitle1" sx={{ ml: 1, flexGrow: 1 }}>
-                            Job #{job.id.slice(0, 8)}
-                          </Typography>
-                          <Chip 
-                            label={job.status} 
-                            color={getStatusColor(job.status)}
-                            size="small"
-                          />
-                        </Box>
-                        
-                        <Typography variant="h6" color="text.priary" sx={{ mb: 1 }}>
-                          {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
-                        </Typography>
-                        
-                        <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                          Files: {job.files.map(f => f.name).join(', ')}
-                        </Typography>
-                        
-                        <Typography variant="caption" color="text.secondary">
-                          Submitted: {job.submittedAt.toLocaleString()}
-                        </Typography>
-
-                        {job.status === 'completed' && job.result_url && job.filenames && (
-                          <Box sx={{ mt: 2 }}>
-                            <Button
-                              variant="contained"
-                              startIcon={<Download />}
-                              onClick={() => downloadResult(job.result_url!, job.filenames!)}
-                              size="small"
-                            >
-                              Download
-                            </Button>
-                          </Box>
-                        )}
-
-                        {job.status === 'failed' && job.error && (
-                          <Alert severity="error" sx={{ mt: 2 }}>
-                            {job.error}
-                          </Alert>
-                        )}
-
-                        {job.status === 'processing' && (
-                          <Box sx={{ mt: 2 }}>
-                            <LinearProgress />
-                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                              Processing... This may take several minutes.
-                            </Typography>
-                          </Box>
-                        )}
-                      </CardContent>
-                    </Card>
-                    {index < queuedJobs.length - 1 && <Divider />}
-                  </React.Fragment>
+            </Paper>
+          ) : (
+            <Paper elevation={0} sx={{ display: 'flex', flexDirection: 'column', gap: '40px',  height: 'fit-content', padding: '40px', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                {queuedJobs.length > 0 && (
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={clearCompletedJobs}
+                      disabled={!hasCompletedJobs}
+                    >
+                      Clear Completed
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={clearAllJobs}
+                      color="error"
+                    >
+                      Clear All
+                    </Button>
+                  </Box>
+                )}
+              </Box>
+              
+              <Box sx={{ display: 'flex', flexDirection:'column', gap: '16px' }}>
+                {queuedJobs.map(job => (
+                    <JobItem job={job} />
                 ))}
-              </List>
-            )}
-          </Paper>
-        </Grid>
-      </Grid>
+              </Box>
+            </Paper>
+          )}
+        </Box>
+      </Box>
     </Container>
   );
 };
