@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, Box, Typography, Button, Alert, LinearProgress } from '@mui/material';
-import { Download, Error as ErrorIcon, CheckCircle, Schedule } from '@mui/icons-material';
+import { Box, Typography, Button, Alert, LinearProgress } from '@mui/material';
+import { Error as ErrorIcon, CheckCircle, Schedule } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { availableLanguages } from '../data/languages';
 import { QueuedJob } from '../hooks/useJobQueue';
@@ -74,8 +74,8 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
   };
 
   return (
-    <Card className='job-item' sx={{ borderRadius: '10px' }}>
-      <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+    <Box className='job-item' sx={{ p: '40px', border: '1px solid', borderColor: '#e6e6e6', borderRadius: '10px' }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <Box sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           {getStatusIcon(job.status)}
           <Box flex="1 0 0">
@@ -97,14 +97,14 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
         </Box>
 
         {job.status === 'completed' && job.result_url && job.filenames && (
-          <Box sx={{ mt: 2 }}>
+          <Box>
             <Button
               variant="contained"
-              startIcon={<Download />}
               onClick={() => downloadResult(job.result_url!, job.filenames!)}
               size="small"
+              fullWidth
             >
-              Download
+              Download All
             </Button>
           </Box>
         )}
@@ -114,8 +114,8 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             {job.error}
           </Alert>
         )}
-      </CardContent>
-    </Card>
+      </Box>
+    </Box>
   );
 };
 
