@@ -6,9 +6,7 @@ import {
   Box,
   Button,
   Alert,
-  List,
   IconButton,
-  Divider,
 } from '@mui/material';
 import { CloudUpload, SwapHoriz, DeleteOutline } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
@@ -33,7 +31,11 @@ const BatchTranslatePage: React.FC = () => {
     clearCompletedJobs,
     clearAllJobs,
     hasCompletedJobs,
+    cancelJob,
   } = useJobQueue();
+
+  const pendingJobs = queuedJobs.filter(job => job.status !== 'completed');
+  const completedJobs = queuedJobs.filter(job => job.status === 'completed');
 
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (files) {
@@ -337,8 +339,16 @@ const BatchTranslatePage: React.FC = () => {
               </Box>
               
               <Box sx={{ display: 'flex', flexDirection:'column', gap: '16px' }}>
-                {queuedJobs.map(job => (
-                    <JobItem job={job} />
+                {/* Completed Jobs */}
+                {completedJobs.length > 0 && (
+                    completedJobs.map(job => (
+                      <JobItem key={job.id} job={job} onCancel={() => cancelJob(job.id)} />
+                    ))
+                )}
+
+                {/* Active Jobs */}
+                {pendingJobs.map(job => (
+                  <JobItem key={job.id} job={job} onCancel={() => cancelJob(job.id)} />
                 ))}
               </Box>
             </Paper>

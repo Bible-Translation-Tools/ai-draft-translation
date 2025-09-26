@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { getBatchJobStatus, BatchJobStatus } from '../api/translate';
+import { getBatchJobStatus, BatchJobStatus, cancelBatchJob } from '../api/translate';
 
 export interface QueuedJob extends BatchJobStatus {
   id: string;
@@ -166,12 +166,46 @@ export const useJobQueue = () => {
     });
   }, []);
 
-  const clearAllJobs = useCallback(() => {
+  const clearAllJobs = useCallback(async () => {
+    // Stop polling for all jobs
+    pollingIntervals.current.forEach(interval => clearInterval(interval));
+    pollingIntervals.current.clear();
+
+    // Cancel processing jobs on the server
+    const processingJobs = queuedJobs.filter(job => job.status === 'processing');
+    if (processingJobs.length > 0) {
+      await Promise.allSettled(processingJobs.map(job => cancelBatchJob(job.id)));
+    }
+
+    // Clear state and storage
     setQueuedJobs([]);
     localStorage.removeItem(JOBS_STORAGE_NAME);
-  }, []);
+  }, [queuedJobs]);
 
   const hasCompletedJobs = queuedJobs.some(job => job.status === 'completed' || job.status === 'failed');
+
+  const cancelJob = useCallback(async (jobId: string) => {
+    // Stop polling if exists
+    const interval = pollingIntervals.current.get(jobId);
+    if (interval) {
+      clearInterval(interval);
+      pollingIntervals.current.delete(jobId);
+    }
+
+    // Call API to cancel on server
+    await cancelBatchJob(jobId);
+
+    // Remove from state and storage
+    setQueuedJobs(prev => {
+      const filtered = prev.filter(job => job.id !== jobId);
+      if (filtered.length > 0) {
+        saveJobsToStorage(filtered);
+      } else {
+        localStorage.removeItem(JOBS_STORAGE_NAME);
+      }
+      return filtered;
+    });
+  }, []);
 
   return {
     queuedJobs,
@@ -180,5 +214,6 @@ export const useJobQueue = () => {
     clearCompletedJobs,
     clearAllJobs,
     hasCompletedJobs,
+    cancelJob,
   };
 };

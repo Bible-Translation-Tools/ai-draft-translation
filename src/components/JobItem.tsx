@@ -8,6 +8,7 @@ import SelectedFileCard from './SelectedFileCard';
 
 interface JobItemProps {
   job: QueuedJob;
+  onCancel?: () => void;
 }
 
   const getLanguageName = (code: string) => {
@@ -24,22 +25,22 @@ interface JobItemProps {
   };
 
   
-const JobItem: React.FC<JobItemProps> = ({ job }) => {
+const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle color="success" />;
+        return <CheckCircle fontSize='large' color="success" />;
       case 'failed':
-        return <ErrorIcon color="error" />;
+        return <ErrorIcon fontSize='large' color="error" />;
       case 'processing':
-        return <CircularProgress size={20} color="primary" />;
+        return <CircularProgress size={35} color="primary" />;
       default:
-        return <Schedule color="action" />;
+        return <Schedule fontSize='large' color="action" />;
     }
   };
 
   // Progress bar based on status
-  const renderProgress = () => {
+  const renderProgressBar = () => {
     let displayText = '';
     let progressProps: any = {};
     let show = true;
@@ -86,9 +87,14 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               Submitted: {job.submittedAt.toLocaleString()}
             </Typography>
           </Box>
+          {job.status !== 'completed' && (
+            <Button variant="outlined" size="small" color="error" onClick={onCancel}>
+              Cancel
+            </Button>
+          )}
         </Box>
 
-        {renderProgress()}
+        {renderProgressBar()}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
           {job.files.map((file, index) => (
