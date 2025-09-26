@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { getBatchJobStatus, BatchJobStatus } from '../api/translate';
+import { getBatchJobStatus, BatchJobStatus, cancelBatchJob } from '../api/translate';
 
 export interface QueuedJob extends BatchJobStatus {
   id: string;
@@ -173,6 +173,29 @@ export const useJobQueue = () => {
 
   const hasCompletedJobs = queuedJobs.some(job => job.status === 'completed' || job.status === 'failed');
 
+  const cancelJob = useCallback(async (jobId: string) => {
+    // Stop polling if exists
+    const interval = pollingIntervals.current.get(jobId);
+    if (interval) {
+      clearInterval(interval);
+      pollingIntervals.current.delete(jobId);
+    }
+
+    // Call API to cancel on server
+    await cancelBatchJob(jobId);
+
+    // Remove from state and storage
+    setQueuedJobs(prev => {
+      const filtered = prev.filter(job => job.id !== jobId);
+      if (filtered.length > 0) {
+        saveJobsToStorage(filtered);
+      } else {
+        localStorage.removeItem(JOBS_STORAGE_NAME);
+      }
+      return filtered;
+    });
+  }, []);
+
   return {
     queuedJobs,
     addJob,
@@ -180,5 +203,6 @@ export const useJobQueue = () => {
     clearCompletedJobs,
     clearAllJobs,
     hasCompletedJobs,
+    cancelJob,
   };
 };

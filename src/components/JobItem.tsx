@@ -8,6 +8,7 @@ import SelectedFileCard from './SelectedFileCard';
 
 interface JobItemProps {
   job: QueuedJob;
+  onCancel?: () => void;
 }
 
   const getLanguageName = (code: string) => {
@@ -24,7 +25,7 @@ interface JobItemProps {
   };
 
   
-const JobItem: React.FC<JobItemProps> = ({ job }) => {
+const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'completed':
@@ -87,7 +88,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             </Typography>
           </Box>
           {job.status !== 'completed' && (
-            <Button variant="outlined" size="small" color="error">
+            <Button variant="outlined" size="small" color="error" onClick={onCancel}>
               Cancel
             </Button>
           )}

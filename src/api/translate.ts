@@ -102,3 +102,18 @@ export const getBatchJobStatus = async (statusUrl: string): Promise<BatchJobStat
     throw new Error('An unexpected error occurred');
   }
 };
+
+// Cancel a batch job by its id
+export const cancelBatchJob = async (jobId: string): Promise<void> => {
+  try {
+    await apiClient.delete(`/jobs/${jobId}`);
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        throw new Error(`Cancel failed: ${error.response.data?.message || error.message}`);
+      }
+      throw new Error(`Network error: ${error.message}`);
+    }
+    throw new Error('An unexpected error occurred');
+  }
+};
