@@ -166,10 +166,21 @@ export const useJobQueue = () => {
     });
   }, []);
 
-  const clearAllJobs = useCallback(() => {
+  const clearAllJobs = useCallback(async () => {
+    // Stop polling for all jobs
+    pollingIntervals.current.forEach(interval => clearInterval(interval));
+    pollingIntervals.current.clear();
+
+    // Cancel processing jobs on the server
+    const processingJobs = queuedJobs.filter(job => job.status === 'processing');
+    if (processingJobs.length > 0) {
+      await Promise.allSettled(processingJobs.map(job => cancelBatchJob(job.id)));
+    }
+
+    // Clear state and storage
     setQueuedJobs([]);
     localStorage.removeItem(JOBS_STORAGE_NAME);
-  }, []);
+  }, [queuedJobs]);
 
   const hasCompletedJobs = queuedJobs.some(job => job.status === 'completed' || job.status === 'failed');
 
