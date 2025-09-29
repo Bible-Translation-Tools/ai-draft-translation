@@ -137,7 +137,7 @@ export const useJobQueue = () => {
     
     // Then set up interval for subsequent polls
     const interval = setInterval(pollStatus, 5000); // Poll every 5 seconds
-    pollingIntervals.current.set(jobId, interval);
+    pollingIntervals.current.set(jobId, interval as any);
   }, []);
 
   const addJob = useCallback((job: QueuedJob) => {
