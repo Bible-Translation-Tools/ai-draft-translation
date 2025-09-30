@@ -23,10 +23,13 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     }
   };
 
+  // Ensure UI options are presented alphabetically by name, regardless of data order
+  const sortedLanguages = [...availableLanguages].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <Autocomplete<Language, false, false, false>
-      options={availableLanguages}
-      getOptionLabel={(option) => option.name}
+      options={sortedLanguages}
+      getOptionLabel={(lang) => lang.name}
       value={selectedLanguage || null}
       onChange={handleChange}
       disabled={disabled}
