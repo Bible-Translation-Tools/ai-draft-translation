@@ -6,10 +6,11 @@ import {
   Box,
   Button,
   LinearProgress,
+  TextField,
+  IconButton,
 } from '@mui/material';
 import { SwapHoriz, Clear } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
-import TextInput from '../components/TextInput';
 import OutputBox from '../components/OutputBox';
 import TranslationHistory from '../components/TranslationHistory';
 import { translateText } from '../api/translate';
@@ -87,97 +88,90 @@ const TranslatePage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" disableGutters>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column', md: 'row' },
-          gap: 3,
-          alignItems: 'stretch',
-        }}
-      >
-        {/* Left Column - Input */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
-            <Typography variant="h6" gutterBottom>
-              Source Language
-            </Typography>
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 5 }, borderRadius: '16px', boxShadow: 'var(--shadow-level-1)', border: '1px solid var(--mui-palette-divider)' }}>
+        {/* Language selectors row */}
+        <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ flex: 1, minWidth: 240 }}>
             <LanguageSelector
               label="Source Language"
               value={sourceLang}
               onChange={setSourceLang}
               disabled={loading}
             />
-
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Input Text
-              </Typography>
-              <TextInput
-                value={sourceText}
-                onChange={setSourceText}
-                onTranslate={handleTranslate}
-                loading={loading}
-                disabled={loading}
-              />
-            </Box>
-
-            <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-              <Button
-                variant="outlined"
-                startIcon={<SwapHoriz />}
-                onClick={handleSwapLanguages}
-                disabled={loading}
-                fullWidth
-              >
-                Swap Languages
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<Clear />}
-                onClick={handleClear}
-                disabled={loading}
-                fullWidth
-              >
-                Clear
-              </Button>
-            </Box>
-          </Paper>
-        </Box>
-
-        {/* Right Column - Output */}
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Paper elevation={0} sx={{ p: 3, height: 'fit-content', borderRadius: '16px', boxShadow: 'var(--shadow-level-1)' }}>
-            <Typography variant="h6" gutterBottom>
-              Target Language
-            </Typography>
+          </Box>
+          <IconButton onClick={handleSwapLanguages} disabled={loading} aria-label="Swap languages">
+            <SwapHoriz />
+          </IconButton>
+          <Box sx={{ flex: 1, minWidth: 240 }}>
             <LanguageSelector
               label="Target Language"
               value={targetLang}
               onChange={setTargetLang}
               disabled={loading}
             />
-
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" gutterBottom>
-                Translation
-              </Typography>
-              {loading && (
-                <Box sx={{ mb: 2 }}>
-                  <LinearProgress />
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                    Translation in progress... This may take several minutes.
-                  </Typography>
-                </Box>
-              )}
-              <OutputBox
-                translatedText={translatedText}
-                loading={loading}
-                error={error}
-              />
-            </Box>
-          </Paper>
+          </Box>
         </Box>
-      </Box>
+
+        {/* Input and Output boxes + actions (grid ensures buttons match left column width) */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            columnGap: { xs: 2, md: 7 },
+            rowGap: 2,
+            alignItems: 'stretch',
+          }}
+        >
+          <Box sx={{ minWidth: 0 }}>
+            <TextField
+              multiline
+              rows={12}
+              value={sourceText}
+              onChange={(e) => setSourceText(e.target.value)}
+              placeholder="Enter text"
+              disabled={loading}
+              fullWidth
+              variant="outlined"
+            />
+          </Box>
+          <Box sx={{ minWidth: 0 }}>
+            {loading && (
+              <Box sx={{ mb: 2 }}>
+                <LinearProgress />
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Translation in progress... This may take several minutes.
+                </Typography>
+              </Box>
+            )}
+            <OutputBox
+              translatedText={translatedText}
+              loading={loading}
+              error={error}
+              rows={12}
+            />
+          </Box>
+          {/* Action buttons: occupy left column width on md+, full width on mobile */}
+          <Box sx={{ gridColumn: { xs: '1 / -1', md: '1 / 2' }, mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleTranslate}
+              disabled={loading || !sourceText.trim()}
+              fullWidth
+            >
+              {loading ? 'Translating...' : 'Translate'}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Clear />}
+              onClick={handleClear}
+              disabled={loading}
+              fullWidth
+            >
+              Clear
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
 
       {/* Translation History */}
       <TranslationHistory items={translationHistory} getLanguageName={getLanguageName} />
