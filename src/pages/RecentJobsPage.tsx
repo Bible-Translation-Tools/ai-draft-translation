@@ -7,18 +7,20 @@ import {
     AccordionSummary,
     AccordionDetails,
     Button,
+    IconButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import JobItem from '../components/JobItem';
 import { useJobQueue } from '../hooks/useJobQueue';
 import { availableLanguages } from '../data/languages';
+import { ArrowBack } from '@mui/icons-material';
 
 const getLanguageName = (code: string) => {
     return availableLanguages.find((lang) => lang.code === code)?.name || code;
 };
 
 interface RecentJobsPageProps {
-    onBack?: () => void;
+    onBack: () => void;
 }
 
 const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
@@ -30,12 +32,12 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
     };
 
     return (
-        <Container maxWidth="lg" disableGutters>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h4" component="h4" gutterBottom sx={{ mb: "40px" }}>Recent Jobs</Typography>
-                {onBack && (
-                    <Button variant="outlined" onClick={onBack}>Back to Batch Translate</Button>
-                )}
+        <Container maxWidth="lg" disableGutters sx={{ paddingTop: '50px' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: 3 }}>
+                <IconButton onClick={onBack} aria-label="Back to Batch Translate">
+                    <ArrowBack />
+                </IconButton>
+                <Typography variant="h4" component="h4" sx={{ m: 0, lineHeight: 1 }}>Recent Jobs</Typography>
             </Box>
             {queuedJobs.length === 0 ? (
                 <Box sx={{ textAlign: 'center', py: 8 }}>
