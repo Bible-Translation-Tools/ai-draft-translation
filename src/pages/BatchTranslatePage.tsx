@@ -139,7 +139,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
 
   return (
     <Container maxWidth="lg" disableGutters>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: "40px" }}>Document Translation Tool</Typography>
+      <Typography variant="h4" component="h4" gutterBottom sx={{ mb: "40px" }}>Document Translation Tool</Typography>
       <Box
         sx={{
           display: 'flex',

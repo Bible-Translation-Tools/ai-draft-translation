@@ -88,7 +88,7 @@ const TranslatePage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" disableGutters>
-      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: "40px" }}>Text Translation Tool</Typography>
+      <Typography variant="h4" component="h4" gutterBottom sx={{ mb: "40px" }}>Text Translation Tool</Typography>
       <Paper elevation={0} sx={{ p: { xs: 2, md: 5 }, borderRadius: '16px', boxShadow: 'var(--shadow-level-1)', border: '1px solid var(--mui-palette-divider)' }}>
         {/* Language selectors row */}
         <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center', mb: 3, flexWrap: 'wrap' }}>

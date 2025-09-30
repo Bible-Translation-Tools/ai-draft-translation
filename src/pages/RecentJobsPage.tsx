@@ -32,7 +32,7 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
     return (
         <Container maxWidth="lg" disableGutters>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6">Recent Jobs</Typography>
+            <Typography variant="h4" component="h4" gutterBottom sx={{ mb: "40px" }}>Recent Jobs</Typography>
                 {onBack && (
                     <Button variant="outlined" onClick={onBack}>Back to Batch Translate</Button>
                 )}
