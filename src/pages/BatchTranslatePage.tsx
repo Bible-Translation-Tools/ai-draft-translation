@@ -7,6 +7,7 @@ import {
   Button,
   Alert,
   IconButton,
+  Link,
 } from '@mui/material';
 import { CloudUpload, SwapHoriz, DeleteOutline } from '@mui/icons-material';
 import LanguageSelector from '../components/LanguageSelector';
@@ -15,7 +16,11 @@ import { useJobQueue, QueuedJob } from '../hooks/useJobQueue';
 import JobItem from '../components/JobItem';
 import SelectedFileCard from '../components/SelectedFileCard';
 
-const BatchTranslatePage: React.FC = () => {
+interface BatchTranslatePageProps {
+  onShowRecentJobs?: () => void;
+}
+
+const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJobs }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [sourceLang, setSourceLang] = useState('eng_Latn');
   const [targetLang, setTargetLang] = useState('spa_Latn');
@@ -134,6 +139,7 @@ const BatchTranslatePage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" disableGutters>
+      <Typography variant="h3" component="h1" gutterBottom sx={{ mb: "40px" }}>Document Translation Tool</Typography>
       <Box
         sx={{
           display: 'flex',
@@ -334,6 +340,14 @@ const BatchTranslatePage: React.FC = () => {
                     >
                       Clear All
                     </Button>
+                    <Link 
+                      component="button" 
+                      variant="body2" 
+                      onClick={onShowRecentJobs}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      Recent Jobs
+                    </Link>
                   </Box>
                 )}
               </Box>

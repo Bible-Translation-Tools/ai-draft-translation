@@ -5,6 +5,7 @@ import { Box, Container, Typography } from "@mui/material";
 
 import TranslatePage from "./pages/TranslatePage";
 import BatchTranslatePage from "./pages/BatchTranslatePage";
+import RecentJobsPage from "./pages/RecentJobsPage";
 import ModeToggle from "./components/ModeToggle";
 
 const theme = createTheme({
@@ -20,10 +21,18 @@ const theme = createTheme({
 });
 
 function App() {
-  const [isBatchMode, setIsBatchMode] = useState(true);
+  const [currentPage, setCurrentPage] = useState<'batch' | 'translate' | 'recent'>('batch');
 
   const handleModeChange = (isBatch: boolean) => {
-    setIsBatchMode(isBatch);
+    setCurrentPage(isBatch ? 'batch' : 'translate');
+  };
+
+  const handleShowRecentJobs = () => {
+    setCurrentPage('recent');
+  };
+
+  const handleBackToBatch = () => {
+    setCurrentPage('batch');
   };
 
   return (
@@ -31,16 +40,14 @@ function App() {
       <CssBaseline />
 
       <Container disableGutters sx={{ paddingTop: '50px' }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-          <Typography variant="h3" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {isBatchMode ? "Document Translation Tool" : "Text Translation Tool"}
-          </Typography>
-          <ModeToggle isBatchMode={isBatchMode} onChange={handleModeChange} />
-        </Box>
+        {currentPage !== 'recent' && (
+          <ModeToggle isBatchMode={currentPage === 'batch'} onChange={handleModeChange} />
+        )}
       </Container>
 
-      {!isBatchMode && <TranslatePage />}
-      {isBatchMode && <BatchTranslatePage />}
+      {currentPage === 'translate' && <TranslatePage />}
+      {currentPage === 'batch' && <BatchTranslatePage onShowRecentJobs={handleShowRecentJobs} />}
+      {currentPage === 'recent' && <RecentJobsPage onBack={handleBackToBatch} />}
     </ThemeProvider>
   );
 }
