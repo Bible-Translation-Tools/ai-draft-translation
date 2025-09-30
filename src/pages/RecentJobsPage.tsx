@@ -8,9 +8,11 @@ import {
     AccordionDetails,
     Button,
     IconButton,
+    Alert,
+    LinearProgress,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import JobItem from '../components/JobItem';
+import SelectedFileCard from '../components/SelectedFileCard';
 import { useJobQueue } from '../hooks/useJobQueue';
 import { availableLanguages } from '../data/languages';
 import { ArrowBack } from '@mui/icons-material';
@@ -29,6 +31,46 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
 
     const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpandedId(isExpanded ? panel : false);
+    };
+
+    const renderProgressBar = (status: string) => {
+        let displayText = '';
+        let progressProps: any = {};
+        let show = true;
+        switch (status) {
+            case 'processing':
+                displayText = 'Processing...';
+                progressProps = {};
+                break;
+            case 'queued':
+                displayText = 'Queued...';
+                progressProps = {};
+                break;
+            case 'completed':
+                displayText = 'Completed';
+                progressProps = { variant: 'determinate', value: 100, color: 'success' };
+                break;
+            default:
+                show = false;
+        }
+        if (!show) return null;
+        return (
+            <Box sx={{ textAlign: 'right' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                    {displayText}
+                </Typography>
+                <LinearProgress {...progressProps} />
+            </Box>
+        );
+    };
+
+    const downloadResult = (resultUrl: string, filenames: string[]) => {
+        const link = document.createElement('a');
+        link.href = `${import.meta.env.VITE_SERVER_API_ENDPOINT}${resultUrl}`;
+        link.download = `translated_${filenames.join('_')}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     return (
@@ -57,15 +99,40 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
                                             Submitted: {job.submittedAt.toLocaleString()}
                                         </Typography>
                                     </Box>
-                                    {job.status !== 'completed' && (
-                                        <Button variant="outlined" size="small" color="error" onClick={() => cancelJob(job.id)}>
-                                            Cancel
-                                        </Button>
-                                    )}
                                 </Box>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <JobItem job={job} onCancel={() => cancelJob(job.id)} />
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
+                                    {renderProgressBar(job.status)}
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
+                                        {job.files.map((file, index) => (
+                                            <SelectedFileCard key={index} file={file} />
+                                        ))}
+                                    </Box>
+                                    {job.status === 'completed' && job.result_url && job.filenames && (
+                                        <Box>
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => downloadResult(job.result_url!, job.filenames!)}
+                                                size="small"
+                                                fullWidth
+                                                sx={{ p: '8px 16px' }}
+                                            >
+                                                Download All
+                                            </Button>
+                                        </Box>
+                                    )}
+                                    {job.status !== 'completed' && (
+                                        <Button variant="outlined" fullWidth sx={{ p: '8px 16px' }} color="error" onClick={() => cancelJob(job.id)}>
+                                            Cancel
+                                        </Button>
+                                    )}
+                                    {job.status === 'failed' && job.error && (
+                                        <Alert severity="error" sx={{ mt: 2 }}>
+                                            {job.error}
+                                        </Alert>
+                                    )}
+                                </Box>
                             </AccordionDetails>
                         </Accordion>
                     ))}

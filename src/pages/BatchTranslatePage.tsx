@@ -340,19 +340,21 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
                     >
                       Clear All
                     </Button>
-                    <Link 
-                      component="button" 
-                      variant="body2" 
-                      onClick={onShowRecentJobs}
-                      sx={{ cursor: 'pointer' }}
-                    >
-                      Recent Jobs
-                    </Link>
                   </Box>
                 )}
               </Box>
               
               <Box sx={{ display: 'flex', flexDirection:'column', gap: '16px' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Link 
+                        component="button" 
+                        variant="body2" 
+                        onClick={onShowRecentJobs}
+                        sx={{ cursor: 'pointer' }}
+                      >
+                        View Recent
+                  </Link>
+                </Box>
                 {/* Completed Jobs */}
                 {completedJobs.length > 0 && (
                     completedJobs.map(job => (
