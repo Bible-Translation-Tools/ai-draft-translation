@@ -6,12 +6,14 @@ interface OutputBoxProps {
   translatedText: string;
   loading: boolean;
   error: string | null;
+  rows?: number;
 }
 
 const OutputBox: React.FC<OutputBoxProps> = ({
   translatedText,
   loading,
   error,
+  rows = 12,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -36,7 +38,7 @@ const OutputBox: React.FC<OutputBoxProps> = ({
       <Box sx={{ position: 'relative' }}>
         <TextField
           multiline
-          rows={8}
+          rows={rows}
           value={translatedText}
           placeholder={loading ? 'Translating...' : 'Translation will appear here'}
           fullWidth
@@ -58,9 +60,9 @@ const OutputBox: React.FC<OutputBoxProps> = ({
               onClick={handleCopy}
               sx={{
                 position: 'absolute',
-                top: 8,
-                right: 8,
-                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                bottom: 2,
+                right: 30,
+                backgroundColor: 'rgba(218, 217, 217, 0.21)',
                 '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 1)',
                 },

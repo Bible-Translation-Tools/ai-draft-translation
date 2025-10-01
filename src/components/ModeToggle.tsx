@@ -8,7 +8,7 @@ interface ModeToggleProps {
 
 const ModeToggle: React.FC<ModeToggleProps> = ({ isBatchMode, onChange }) => {
     return (
-        <Box sx={{ display: "flex", alignItems: "center", position: 'relative', top: '-50px' }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", position: 'relative' }}>
             <ToggleButtonGroup
                 exclusive
                 value={isBatchMode ? "batch" : "single"}
