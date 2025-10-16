@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -15,6 +15,7 @@ import { submitBatchTranslation } from '../api/translate';
 import { useJobQueue, QueuedJob } from '../hooks/useJobQueue';
 import JobItem from '../components/JobItem';
 import SelectedFileCard from '../components/SelectedFileCard';
+import PreservedGlossaryDialog from '../components/PreservedGlossaryDialog';
 
 interface BatchTranslatePageProps {
   onShowRecentJobs?: () => void;
@@ -28,6 +29,35 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragActive, setIsDragActive] = useState(false);
+  // Initialize preserved words from localStorage
+  const [preservedWords, setPreservedWords] = useState<string[]>(() => {
+    try {
+      const savedWords = localStorage.getItem('preservedWords');
+      return savedWords ? JSON.parse(savedWords) : [];
+    } catch (error) {
+      console.warn('Failed to parse saved preserved words:', error);
+      return [];
+    }
+  });
+  const [isPreservedGlossaryDialogOpen, setIsPreservedGlossaryDialogOpen] = useState(false);
+
+  // Save preserved words to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('preservedWords', JSON.stringify(preservedWords));
+  }, [preservedWords]);
+
+  const handleAddPreservedWord = useCallback((word: string) => {
+    const normalized = word.trim();
+    if (!normalized) return;
+    setPreservedWords(prev => (prev.includes(normalized) ? prev : [...prev, normalized]));
+  }, []);
+
+  const handleDeletePreservedWord = useCallback((index: number) => {
+    setPreservedWords(prev => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const openPreservedGlossaryDialog = useCallback(() => setIsPreservedGlossaryDialogOpen(true), []);
+  const closePreservedGlossaryDialog = useCallback(() => setIsPreservedGlossaryDialogOpen(false), []);
 
   // Use the custom hook for job queue management
   const {
@@ -105,6 +135,8 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
       formData.append('src_lang', sourceLang);
       formData.append('tgt_lang', targetLang);
 
+      formData.append('preserved_words', JSON.stringify(preservedWords));
+
       // Include subscription ID for push notifications if available
       const subscriptionId = localStorage.getItem('pushSubscriptionId');
       if (subscriptionId) {
@@ -134,7 +166,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedFiles, sourceLang, targetLang, addJob]);
+  }, [selectedFiles, sourceLang, targetLang, preservedWords, addJob]);
 
 
   return (
@@ -193,6 +225,19 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
               </Box>
             </Box>
 
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant="text"
+                onClick={openPreservedGlossaryDialog}
+                disabled={isSubmitting}
+                sx={{ textTransform: 'none', padding: 0, minWidth: 0 }}
+              >
+                <Typography variant="body2" color="primary" sx={{ textDecoration: 'underline' }}>
+                  Manage preserved glossary
+                </Typography>
+              </Button>
+            </Box>
+            
             {/* File Upload Area */}
             <Box
               sx={{
@@ -371,6 +416,15 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
           )}
         </Box>
       </Box>
+
+      <PreservedGlossaryDialog
+        open={isPreservedGlossaryDialogOpen}
+        onClose={closePreservedGlossaryDialog}
+        preservedWords={preservedWords}
+        onAdd={handleAddPreservedWord}
+        onDelete={handleDeletePreservedWord}
+        disabled={isSubmitting}
+      />
     </Container>
   );
 };
