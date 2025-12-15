@@ -70,17 +70,33 @@ const PreservedGlossaryDialog: React.FC<PreservedGlossaryDialogProps> = ({
           </Button>
         </div>
         {preservedWords.length > 0 && (
-          <List dense sx={{ width: '100%', bgcolor: 'background.paper', borderRadius: '8px', mt: 2 }}>
+          <List sx={{ width: '100%', maxHeight: '400px', overflowY: 'auto', bgcolor: 'background.paper', borderRadius: '8px', mt: 2 }}>
             {preservedWords.map((word, index) => (
               <ListItem
                 key={`${word}-${index}`}
                 secondaryAction={
-                  <IconButton edge="end" aria-label="delete" onClick={() => onDelete(index)} disabled={disabled}>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => onDelete(index)}
+                    disabled={disabled}
+                    sx={{ mr: 0.25 }}
+                  >
                     <DeleteOutline />
                   </IconButton>
                 }
+                sx={{
+                  '&:hover': {
+                    bgcolor: 'action.hover',
+                  },
+                }}
               >
-                <ListItemText primary={word} />
+                <ListItemText
+                  primary={word}
+                  primaryTypographyProps={{
+                    color: '#0b0b71'
+                  }}
+                />
               </ListItem>
             ))}
           </List>
