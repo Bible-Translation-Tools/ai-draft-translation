@@ -39,11 +39,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
 
-      <Container disableGutters sx={{ paddingTop: '50px' }}>
+      {/* <Container disableGutters sx={{ paddingTop: '50px' }}>
         {currentPage !== 'recent' && (
           <ModeToggle isBatchMode={currentPage === 'batch'} onChange={handleModeChange} />
         )}
-      </Container>
+      </Container> */}
 
       {currentPage === 'translate' && <TranslatePage />}
       {currentPage === 'batch' && <BatchTranslatePage onShowRecentJobs={handleShowRecentJobs} />}
