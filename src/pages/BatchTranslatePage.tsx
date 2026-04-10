@@ -69,8 +69,9 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
     cancelJob,
   } = useJobQueue();
 
-  const pendingJobs = queuedJobs.filter(job => job.status !== 'completed');
-  const completedJobs = queuedJobs.filter(job => job.status === 'completed');
+  const jobsBySubmittedTime = [...queuedJobs].sort(
+    (a, b) => b.submittedAt.getTime() - a.submittedAt.getTime()
+  );
 
   const handleFileSelect = useCallback((files: FileList | null) => {
     if (files) {
@@ -401,15 +402,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
                         View Recent
                   </Link>
                 </Box>
-                {/* Completed Jobs */}
-                {completedJobs.length > 0 && (
-                    completedJobs.map(job => (
-                      <JobItem key={job.id} job={job} onCancel={() => cancelJob(job.id)} />
-                    ))
-                )}
-
-                {/* Active Jobs */}
-                {pendingJobs.map(job => (
+                {jobsBySubmittedTime.map(job => (
                   <JobItem key={job.id} job={job} onCancel={() => cancelJob(job.id)} />
                 ))}
               </Box>
