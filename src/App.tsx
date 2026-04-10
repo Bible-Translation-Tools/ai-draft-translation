@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import { Container } from "@mui/material";
 
 import TranslatePage from "./pages/TranslatePage";
 import BatchTranslatePage from "./pages/BatchTranslatePage";
 import RecentJobsPage from "./pages/RecentJobsPage";
-import ModeToggle from "./components/ModeToggle";
 
 const theme = createTheme({
   palette: {
@@ -23,10 +21,6 @@ const theme = createTheme({
 function App() {
   const [currentPage, setCurrentPage] = useState<'batch' | 'translate' | 'recent'>('batch');
 
-  const handleModeChange = (isBatch: boolean) => {
-    setCurrentPage(isBatch ? 'batch' : 'translate');
-  };
-
   const handleShowRecentJobs = () => {
     setCurrentPage('recent');
   };
@@ -39,11 +33,6 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
 
-      {/* <Container disableGutters sx={{ paddingTop: '50px' }}>
-        {currentPage !== 'recent' && (
-          <ModeToggle isBatchMode={currentPage === 'batch'} onChange={handleModeChange} />
-        )}
-      </Container> */}
 
       {currentPage === 'translate' && <TranslatePage />}
       {currentPage === 'batch' && <BatchTranslatePage onShowRecentJobs={handleShowRecentJobs} />}
