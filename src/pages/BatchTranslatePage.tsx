@@ -273,13 +273,14 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
                   Choose file(s) or drag & drop it here
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Files supported: USFM, DOCX
+                  Files supported: USFM, DOCX, PDF, PPTX
                 </Typography>
               </Box>
               <input
                 ref={fileInputRef}
                 type="file"
                 multiple
+                accept=".usfm,.docx,.pdf,.pptx"
                 style={{ display: 'none' }}
                 onChange={(e) => handleFileSelect(e.target.files)}
               />
