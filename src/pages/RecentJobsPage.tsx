@@ -9,13 +9,13 @@ import {
     Button,
     IconButton,
     Alert,
-    LinearProgress,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SelectedFileCard from '../components/SelectedFileCard';
 import { useJobQueue } from '../hooks/useJobQueue';
 import { availableLanguages } from '../data/languages';
 import { ArrowBack } from '@mui/icons-material';
+import JobProgressBar from '../components/JobProgressBar';
 
 const getLanguageName = (code: string) => {
     return availableLanguages.find((lang) => lang.code === code)?.name || code;
@@ -31,37 +31,6 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
 
     const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpandedId(isExpanded ? panel : false);
-    };
-
-    const renderProgressBar = (status: string) => {
-        let displayText = '';
-        let progressProps: any = {};
-        let show = true;
-        switch (status) {
-            case 'processing':
-                displayText = 'Processing...';
-                progressProps = {};
-                break;
-            case 'queued':
-                displayText = 'Queued...';
-                progressProps = {};
-                break;
-            case 'completed':
-                displayText = 'Completed';
-                progressProps = { variant: 'determinate', value: 100, color: 'success' };
-                break;
-            default:
-                show = false;
-        }
-        if (!show) return null;
-        return (
-            <Box sx={{ textAlign: 'right' }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-                    {displayText}
-                </Typography>
-                <LinearProgress {...progressProps} />
-            </Box>
-        );
     };
 
     const downloadResult = (resultUrl: string, filenames: string[]) => {
@@ -103,7 +72,7 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
                             </AccordionSummary>
                             <AccordionDetails>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, width: '100%' }}>
-                                    {renderProgressBar(job.status)}
+                                    <JobProgressBar status={job.status} progress_percent={job.progress_percent} />
                                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
                                         {job.files.map((file, index) => (
                                             <SelectedFileCard key={index} file={file} />

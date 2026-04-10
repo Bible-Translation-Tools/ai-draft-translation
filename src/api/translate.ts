@@ -67,6 +67,8 @@ export interface BatchJobStatus {
   filenames?: string[];
   result_url?: string;
   error?: string;
+  /** Server-reported progress for active jobs (0–100). */
+  progress_percent?: number;
 }
 
 export const submitBatchTranslation = async (formData: FormData): Promise<BatchJobSubmission> => {

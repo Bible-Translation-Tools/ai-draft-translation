@@ -1,10 +1,11 @@
 import React from 'react';
-import { Box, Typography, Button, Alert, LinearProgress } from '@mui/material';
+import { Box, Typography, Button, Alert } from '@mui/material';
 import { Error as ErrorIcon, CheckCircle, Schedule } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { availableLanguages } from '../data/languages';
 import { QueuedJob } from '../hooks/useJobQueue';
 import SelectedFileCard from './SelectedFileCard';
+import JobProgressBar from './JobProgressBar';
 
 interface JobItemProps {
   job: QueuedJob;
@@ -39,41 +40,6 @@ const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
     }
   };
 
-  // Progress bar based on status
-  const renderProgressBar = () => {
-    let displayText = '';
-    let progressProps: any = {};
-    let show = true;
-
-    switch (job.status) {
-      case 'processing':
-        displayText = 'Processing...';
-        progressProps = {};
-        break;
-      case 'queued':
-        displayText = 'Queued...';
-        progressProps = {};
-        break;
-      case 'completed':
-        displayText = 'Completed';
-        progressProps = { variant: 'determinate', value: 100, color: 'success' };
-        break;
-      default:
-        show = false;
-    }
-
-    if (!show) return null;
-
-    return (
-      <Box sx={{ textAlign: 'right' }}>
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-          {displayText}
-        </Typography>
-        <LinearProgress {...progressProps} />
-      </Box>
-    );
-  };
-
   return (
     <Box className='job-item' sx={{ p: '40px', border: '1px solid', borderColor: '#e6e6e6', borderRadius: '10px' }}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -94,7 +60,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
           )}
         </Box>
 
-        {renderProgressBar()}
+        <JobProgressBar status={job.status} progress_percent={job.progress_percent} />
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 1 }}>
           {job.files.map((file, index) => (

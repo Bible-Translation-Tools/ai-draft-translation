@@ -17,6 +17,7 @@ interface StoredJob {
   filenames?: string[];
   result_url?: string;
   error?: string;
+  progress_percent?: number;
   submittedAt: string; // ISO string for serialization
   fileNames: string[]; // Store file names instead of File objects
   fileSizes: number[]; // Store file sizes
@@ -37,6 +38,7 @@ const saveJobsToStorage = (jobs: QueuedJob[]) => {
     filenames: job.filenames,
     result_url: job.result_url,
     error: job.error,
+    progress_percent: job.progress_percent,
     submittedAt: job.submittedAt.toISOString(),
     fileNames: job.files.map(file => file.name),
     fileSizes: job.files.map(file => file.size),
@@ -60,6 +62,7 @@ const loadJobsFromStorage = (): QueuedJob[] => {
       filenames: job.filenames,
       result_url: job.result_url,
       error: job.error,
+      progress_percent: job.progress_percent,
       submittedAt: new Date(job.submittedAt),
       files: job.fileNames.map((name, index) => {
         // Create a mock File object with the stored properties
@@ -184,7 +187,7 @@ export const useJobQueue = () => {
 
   const hasCompletedJobs = queuedJobs.some(job => job.status === 'completed' || job.status === 'failed');
 
-  const cancelJob = useCallback(async (jobId: string) => {
+  const cancelJob = useCallback((jobId: string) => {
     // Stop polling if exists
     const interval = pollingIntervals.current.get(jobId);
     if (interval) {
@@ -192,8 +195,9 @@ export const useJobQueue = () => {
       pollingIntervals.current.delete(jobId);
     }
 
-    // Call API to cancel on server
-    await cancelBatchJob(jobId);
+    void cancelBatchJob(jobId).catch((err) => {
+      console.error('Error cancelling job on server:', err);
+    });
 
     // Remove from state and storage
     setQueuedJobs(prev => {
