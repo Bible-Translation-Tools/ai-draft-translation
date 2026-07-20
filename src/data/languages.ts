@@ -27,6 +27,7 @@ export const availableLanguages: Language[] = [
   { code: 'mkd_Latn', name: 'Macedonian' },
   { code: 'mal_Latn', name: 'Malay' },
   { code: 'nor_Latn', name: 'Norwegian' },
+  { code: 'pes_Arab', name: 'Persian (Farsi)' },
   { code: 'pol_Latn', name: 'Polish' },
   { code: 'por_Latn', name: 'Portuguese' },
   { code: 'rus_Cyrl', name: 'Russian' },
@@ -37,6 +38,7 @@ export const availableLanguages: Language[] = [
   { code: 'swe_Latn', name: 'Swedish' },
   { code: 'tha_Thai', name: 'Thai' },
   { code: 'tur_Latn', name: 'Turkish' },
+  { code: 'urd_Arab', name: 'Urdu'},
   { code: 'vie_Latn', name: 'Vietnamese' },
 ];
 
