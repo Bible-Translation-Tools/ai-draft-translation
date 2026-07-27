@@ -36,6 +36,7 @@ export const availableLanguages: Language[] = [
   { code: 'slv_Latn', name: 'Slovenian' },
   { code: 'spa_Latn', name: 'Spanish' },
   { code: 'swe_Latn', name: 'Swedish' },
+  { code: 'swh_Latn', name: 'Swahili' },
   { code: 'tha_Thai', name: 'Thai' },
   { code: 'tur_Latn', name: 'Turkish' },
   { code: 'urd_Arab', name: 'Urdu'},
