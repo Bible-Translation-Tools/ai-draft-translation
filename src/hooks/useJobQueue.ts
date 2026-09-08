@@ -6,7 +6,7 @@ export interface QueuedJob extends BatchJobStatus {
   submittedAt: Date;
   files: File[];
   sourceLang: string;
-  targetLang: string;
+  targetLangs: string[];
   statusUrl?: string;
 }
 
@@ -22,12 +22,24 @@ interface StoredJob {
   fileNames: string[]; // Store file names instead of File objects
   fileSizes: number[]; // Store file sizes
   sourceLang: string;
-  targetLang: string;
+  /** @deprecated Prefer targetLangs; kept for older localStorage entries. */
+  targetLang?: string;
+  targetLangs?: string[];
   statusUrl?: string; // Store the status URL for polling
 }
 
 // localStorage key for persisting jobs
 const JOBS_STORAGE_NAME = 'batch-translation-jobs';
+
+const normalizeTargetLangs = (job: Pick<StoredJob, 'targetLangs' | 'targetLang'>): string[] => {
+  if (job.targetLangs && job.targetLangs.length > 0) {
+    return job.targetLangs;
+  }
+  if (job.targetLang) {
+    return [job.targetLang];
+  }
+  return [];
+};
 
 // Helper functions for localStorage
 const saveJobsToStorage = (jobs: QueuedJob[]) => {
@@ -43,7 +55,7 @@ const saveJobsToStorage = (jobs: QueuedJob[]) => {
     fileNames: job.files.map(file => file.name),
     fileSizes: job.files.map(file => file.size),
     sourceLang: job.sourceLang,
-    targetLang: job.targetLang,
+    targetLangs: job.targetLangs,
     statusUrl: job.statusUrl,
   }));
   localStorage.setItem(JOBS_STORAGE_NAME, JSON.stringify(storedJobs));
@@ -71,7 +83,7 @@ const loadJobsFromStorage = (): QueuedJob[] => {
         return file;
       }),
       sourceLang: job.sourceLang,
-      targetLang: job.targetLang,
+      targetLangs: normalizeTargetLangs(job),
       statusUrl: job.statusUrl,
     }));
   } catch (error) {

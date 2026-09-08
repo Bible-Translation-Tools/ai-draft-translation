@@ -16,6 +16,17 @@ interface JobItemProps {
     return availableLanguages.find((lang) => lang.code === code)?.name || code;
   };
 
+  const formatJobLanguages = (sourceLang: string, targetLangs: string[]) => {
+    const source = getLanguageName(sourceLang);
+    if (targetLangs.length === 0) {
+      return source;
+    }
+    if (targetLangs.length === 1) {
+      return `${source} → ${getLanguageName(targetLangs[0])}`;
+    }
+    return `${source} → ${targetLangs.map(getLanguageName).join(', ')}`;
+  };
+
   const downloadResult = (resultUrl: string, filenames: string[]) => {
     const link = document.createElement('a');
     link.href = `${import.meta.env.VITE_SERVER_API_ENDPOINT}${resultUrl}`;
@@ -47,7 +58,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
           {getStatusIcon(job.status)}
           <Box flex="1 0 0">
             <Typography variant="h6" color="text.priary">
-              {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
+              {formatJobLanguages(job.sourceLang, job.targetLangs)}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Submitted: {job.submittedAt.toLocaleString()}

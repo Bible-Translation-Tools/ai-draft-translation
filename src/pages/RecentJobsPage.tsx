@@ -21,6 +21,17 @@ const getLanguageName = (code: string) => {
     return availableLanguages.find((lang) => lang.code === code)?.name || code;
 };
 
+const formatJobLanguages = (sourceLang: string, targetLangs: string[]) => {
+    const source = getLanguageName(sourceLang);
+    if (targetLangs.length === 0) {
+        return source;
+    }
+    if (targetLangs.length === 1) {
+        return `${source} → ${getLanguageName(targetLangs[0])}`;
+    }
+    return `${source} → ${targetLangs.map(getLanguageName).join(', ')}`;
+};
+
 interface RecentJobsPageProps {
     onBack: () => void;
 }
@@ -62,7 +73,7 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
                                 <Box sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                     <Box flex="1 0 0">
                                         <Typography variant="h6" color="text.priary">
-                                            {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
+                                            {formatJobLanguages(job.sourceLang, job.targetLangs)}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
                                             Submitted: {job.submittedAt.toLocaleString()}

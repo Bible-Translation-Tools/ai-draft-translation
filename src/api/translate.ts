@@ -56,6 +56,13 @@ export const translateText = async (request: TranslationRequest): Promise<Transl
 };
 
 // Batch translation interfaces
+export interface BatchJobMetadata {
+  src_lang: string;
+  tgt_langs: string[];
+  subscription_id?: string | null;
+  preserved_words: string[];
+}
+
 export interface BatchJobSubmission {
   job_id: string;
   status_url: string;
@@ -70,6 +77,18 @@ export interface BatchJobStatus {
   /** Server-reported progress for active jobs (0–100). */
   progress_percent?: number;
 }
+
+export const buildBatchJobFormData = (
+  files: File[],
+  metadata: BatchJobMetadata
+): FormData => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+  formData.append('metadata', JSON.stringify(metadata));
+  return formData;
+};
 
 export const submitBatchTranslation = async (formData: FormData): Promise<BatchJobSubmission> => {
   try {
