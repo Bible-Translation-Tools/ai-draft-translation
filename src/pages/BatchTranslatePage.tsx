@@ -24,7 +24,7 @@ interface BatchTranslatePageProps {
 const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJobs }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [sourceLang, setSourceLang] = useState('eng_Latn');
-  const [targetLang, setTargetLang] = useState('spa_Latn');
+  const [targetLangs, setTargetLangs] = useState<string[]>(['spa_Latn']);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,16 +112,31 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
     setError(null);
   }, []);
 
-  const handleSwapLanguages = useCallback(() => {
-    setSourceLang(targetLang);
-    setTargetLang(sourceLang);
+  const handleSourceLangChange = useCallback((code: string) => {
+    setSourceLang(code);
+    setTargetLangs(prev => prev.filter(lang => lang !== code));
     setError(null);
-  }, [sourceLang, targetLang]);
+  }, []);
+
+  const handleSwapLanguages = useCallback(() => {
+    if (targetLangs.length !== 1) {
+      return;
+    }
+    const [onlyTarget] = targetLangs;
+    setSourceLang(onlyTarget);
+    setTargetLangs([sourceLang]);
+    setError(null);
+  }, [sourceLang, targetLangs]);
 
 
   const handleSubmit = useCallback(async () => {
     if (selectedFiles.length === 0) {
       setError('Please select at least one file');
+      return;
+    }
+
+    if (targetLangs.length === 0) {
+      setError('Please select at least one target language');
       return;
     }
 
@@ -134,7 +149,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
         formData.append('files', file);
       });
       formData.append('src_lang', sourceLang);
-      formData.append('tgt_lang', targetLang);
+      formData.append('tgt_langs', JSON.stringify(targetLangs));
 
       formData.append('preserved_words', JSON.stringify(preservedWords));
 
@@ -154,7 +169,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
         submittedAt: new Date(),
         files: selectedFiles,
         sourceLang,
-        targetLang,
+        targetLangs,
         statusUrl: response.status_url,
       };
 
@@ -167,7 +182,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedFiles, sourceLang, targetLang, preservedWords, addJob]);
+  }, [selectedFiles, sourceLang, targetLangs, preservedWords, addJob]);
 
 
   return (
@@ -201,7 +216,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
                 <LanguageSelector
                   label="Source Language"
                   value={sourceLang}
-                  onChange={setSourceLang}
+                  onChange={handleSourceLangChange}
                   disabled={isSubmitting}
                 />
               </Box>
@@ -211,16 +226,18 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
                 size="small"
                 aria-label="swap languages"
                 onClick={handleSwapLanguages}
-                disabled={isSubmitting}
+                disabled={isSubmitting || targetLangs.length !== 1}
               >
                 <SwapHoriz sx={{ width: 24, height: 24 }} />
               </IconButton>
 
               <Box flex="1 0 0">
                 <LanguageSelector
-                  label="Target Language"
-                  value={targetLang}
-                  onChange={setTargetLang}
+                  multiple
+                  label="Target Languages"
+                  value={targetLangs}
+                  onChange={setTargetLangs}
+                  excludeCodes={[sourceLang]}
                   disabled={isSubmitting}
                 />
               </Box>
@@ -322,7 +339,7 @@ const BatchTranslatePage: React.FC<BatchTranslatePageProps> = ({ onShowRecentJob
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={isSubmitting || selectedFiles.length === 0}
+              disabled={isSubmitting || selectedFiles.length === 0 || targetLangs.length === 0}
               fullWidth
               size="large"
             >

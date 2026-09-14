@@ -6,7 +6,7 @@ export interface QueuedJob extends BatchJobStatus {
   submittedAt: Date;
   files: File[];
   sourceLang: string;
-  targetLang: string;
+  targetLangs: string[];
   statusUrl?: string;
 }
 
@@ -22,7 +22,9 @@ interface StoredJob {
   fileNames: string[]; // Store file names instead of File objects
   fileSizes: number[]; // Store file sizes
   sourceLang: string;
-  targetLang: string;
+  targetLangs?: string[];
+  /** @deprecated legacy single-target field; migrated to targetLangs on load */
+  targetLang?: string;
   statusUrl?: string; // Store the status URL for polling
 }
 
@@ -43,7 +45,7 @@ const saveJobsToStorage = (jobs: QueuedJob[]) => {
     fileNames: job.files.map(file => file.name),
     fileSizes: job.files.map(file => file.size),
     sourceLang: job.sourceLang,
-    targetLang: job.targetLang,
+    targetLangs: job.targetLangs,
     statusUrl: job.statusUrl,
   }));
   localStorage.setItem(JOBS_STORAGE_NAME, JSON.stringify(storedJobs));
@@ -71,7 +73,7 @@ const loadJobsFromStorage = (): QueuedJob[] => {
         return file;
       }),
       sourceLang: job.sourceLang,
-      targetLang: job.targetLang,
+      targetLangs: job.targetLangs ?? (job.targetLang ? [job.targetLang] : []),
       statusUrl: job.statusUrl,
     }));
   } catch (error) {

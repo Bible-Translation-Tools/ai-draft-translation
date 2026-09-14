@@ -13,13 +13,9 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SelectedFileCard from '../components/SelectedFileCard';
 import { useJobQueue } from '../hooks/useJobQueue';
-import { availableLanguages } from '../data/languages';
+import { formatLanguagePair } from '../data/languages';
 import { ArrowBack } from '@mui/icons-material';
 import JobProgressBar from '../components/JobProgressBar';
-
-const getLanguageName = (code: string) => {
-    return availableLanguages.find((lang) => lang.code === code)?.name || code;
-};
 
 interface RecentJobsPageProps {
     onBack: () => void;
@@ -62,7 +58,7 @@ const RecentJobsPage: React.FC<RecentJobsPageProps> = ({ onBack }) => {
                                 <Box sx={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                                     <Box flex="1 0 0">
                                         <Typography variant="h6" color="text.priary">
-                                            {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
+                                            {formatLanguagePair(job.sourceLang, job.targetLangs)}
                                         </Typography>
                                         <Typography variant="caption" color="text.secondary">
                                             Submitted: {job.submittedAt.toLocaleString()}

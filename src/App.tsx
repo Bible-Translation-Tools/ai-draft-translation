@@ -2,7 +2,6 @@ import { useState } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
-import TranslatePage from "./pages/TranslatePage";
 import BatchTranslatePage from "./pages/BatchTranslatePage";
 import RecentJobsPage from "./pages/RecentJobsPage";
 
@@ -19,7 +18,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<'batch' | 'translate' | 'recent'>('batch');
+  const [currentPage, setCurrentPage] = useState<'batch' | 'recent'>('batch');
 
   const handleShowRecentJobs = () => {
     setCurrentPage('recent');
@@ -32,9 +31,6 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-
-
-      {currentPage === 'translate' && <TranslatePage />}
       {currentPage === 'batch' && <BatchTranslatePage onShowRecentJobs={handleShowRecentJobs} />}
       {currentPage === 'recent' && <RecentJobsPage onBack={handleBackToBatch} />}
     </ThemeProvider>

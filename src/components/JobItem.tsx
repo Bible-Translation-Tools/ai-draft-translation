@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Button, Alert } from '@mui/material';
 import { Error as ErrorIcon, CheckCircle, Schedule } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
-import { availableLanguages } from '../data/languages';
+import { formatLanguagePair } from '../data/languages';
 import { QueuedJob } from '../hooks/useJobQueue';
 import SelectedFileCard from './SelectedFileCard';
 import JobProgressBar from './JobProgressBar';
@@ -12,11 +12,7 @@ interface JobItemProps {
   onCancel?: () => void;
 }
 
-  const getLanguageName = (code: string) => {
-    return availableLanguages.find((lang) => lang.code === code)?.name || code;
-  };
-
-  const downloadResult = (resultUrl: string, filenames: string[]) => {
+const downloadResult = (resultUrl: string, filenames: string[]) => {
     const link = document.createElement('a');
     link.href = `${import.meta.env.VITE_SERVER_API_ENDPOINT}${resultUrl}`;
     link.download = `translated_${filenames.join('_')}.zip`;
@@ -47,7 +43,7 @@ const JobItem: React.FC<JobItemProps> = ({ job, onCancel }) => {
           {getStatusIcon(job.status)}
           <Box flex="1 0 0">
             <Typography variant="h6" color="text.priary">
-              {getLanguageName(job.sourceLang)} → {getLanguageName(job.targetLang)}
+              {formatLanguagePair(job.sourceLang, job.targetLangs)}
             </Typography>
             <Typography variant="caption" color="text.secondary">
               Submitted: {job.submittedAt.toLocaleString()}

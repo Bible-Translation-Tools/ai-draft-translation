@@ -4,6 +4,26 @@ export interface Language {
   name: string;
 }
 
+export const getLanguageName = (code: string): string => {
+  return availableLanguages.find((lang) => lang.code === code)?.name || code;
+};
+
+export const getSortedLanguages = (): Language[] => {
+  return [...availableLanguages].sort((a, b) => a.name.localeCompare(b.name));
+};
+
+/** e.g. "English → Spanish" or "English → Spanish + 4 more" */
+export const formatLanguagePair = (sourceCode: string, targetCodes: string[]): string => {
+  const source = getLanguageName(sourceCode);
+  if (targetCodes.length === 0) {
+    return source;
+  }
+  if (targetCodes.length <= 2) {
+    return `${source} → ${targetCodes.map(getLanguageName).join(', ')}`;
+  }
+  return `${source} → ${getLanguageName(targetCodes[0])} + ${targetCodes.length - 1} more`;
+};
+
 export const availableLanguages: Language[] = [
   { code: 'ara_Arab', name: 'Arabic' },
   { code: 'ben_Beng', name: 'Bengali' },

@@ -1,39 +1,29 @@
-# NLLB Translation Service
+# Document Translation Tool
 
-A React web application that provides translation services using the NLLB (No Language Left Behind) model. The app mimics Google Translate functionality with a modern, responsive interface.
+A React web application for translating documents with the NLLB (No Language Left Behind) model. Upload USFM, DOCX, PDF, or PPTX files and translate them into one or more target languages.
 
 ## Features
 
-- **Multi-language Support**: Support for 20+ languages including English, Spanish, French, German, Chinese, Japanese, and more
-- **Real-time Translation**: Submit text for translation with proper handling of long-running requests
-- **Modern UI**: Built with Material-UI components for a clean, professional interface
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
-- **Translation History**: Keeps track of recent translations for easy reference
-- **Copy to Clipboard**: One-click copying of translated text
-- **Language Swapping**: Quick swap between source and target languages
-- **Error Handling**: Comprehensive error handling with user-friendly messages
-
-## Key Technical Features
-
-- **Long Request Handling**: Configured to handle translation requests that may take 10 seconds to several minutes
-- **Timeout Management**: 5-minute timeout with proper error handling
-- **Loading States**: Clear visual feedback during translation process
-- **Keyboard Shortcuts**: Ctrl/Cmd + Enter to trigger translation
+- **Document jobs**: Submit one or more files as a batch translation job
+- **Multiple target languages**: Select several languages, or all languages except the source
+- **Job queue**: Track queued, processing, completed, and failed jobs
+- **Preserved glossary**: Keep specific words untranslated
+- **Push notifications**: Optional job-complete notifications
 
 ## Project Structure
 
 ```
 src/
 ├── components/
-│   ├── LanguageSelector.tsx    # Language dropdown component
-│   ├── TextInput.tsx          # Input text area with translate button
-│   └── OutputBox.tsx          # Output display with copy functionality
+│   ├── LanguageSelector.tsx    # Single- and multi-select language pickers
+│   └── JobItem.tsx             # Job status card
 ├── pages/
-│   └── TranslatePage.tsx      # Main translation page
+│   ├── BatchTranslatePage.tsx  # Document translation
+│   └── RecentJobsPage.tsx      # Job history
 ├── api/
-│   └── translate.ts           # API service and language definitions
-├── App.tsx                    # Main app component with theme
-└── main.tsx                   # Application entry point
+│   └── translate.ts            # Job submit / poll / cancel
+├── App.tsx
+└── main.tsx
 ```
 
 ## Getting Started
@@ -71,25 +61,15 @@ pnpm build
 
 ## API Configuration
 
-The app expects the NLLB translation API to be available at `/api/translate`. The API should accept POST requests with the following structure:
+Document jobs are submitted to `{VITE_SERVER_API_ENDPOINT}/jobs` as `multipart/form-data`:
 
-```json
-{
-  "text": "Text to translate",
-  "source_lang": "eng_Latn",
-  "target_lang": "spa_Latn"
-}
-```
-
-And return responses in this format:
-
-```json
-{
-  "translated_text": "Translated text",
-  "source_lang": "eng_Latn",
-  "target_lang": "spa_Latn"
-}
-```
+| Field | Type | Notes |
+|-------|------|--------|
+| `files` | File (repeated) | `.usfm`, `.docx`, `.pdf`, `.pptx` |
+| `src_lang` | string | NLLB code, e.g. `eng_Latn` |
+| `tgt_langs` | JSON string | Array of NLLB codes, e.g. `["spa_Latn","fra_Latn"]` |
+| `preserved_words` | JSON string | Array of strings to leave untranslated |
+| `subscription_id` | string | Optional push subscription |
 
 ## Supported Languages
 
